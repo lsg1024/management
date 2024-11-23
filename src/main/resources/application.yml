@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: management
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-authentication-method: client_secret_post
+            client-name: kakao
+            client-id: ${Kakao_Client_ID}
+            client-secret: ${Kakao_Client_SECRET}
+            authorization-grant-type: authorization_code
+            provider: kakao
+            redirect-uri: ${Kakao_Redirect-URI}
+            scope:
+              - profile_nickname
+              - account_email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+  main:
+    allow-bean-definition-overriding: true
+  sql:
+    init:
+      mode: never
+  profiles:
+    active: local
+    include: secret-key
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/management
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  #    username: root
+  #    password: ${DB_PASSWORD}
+  #    driver-class-name: org.mariadb.jdbc.Driver
+  #    url: jdbc:mariadb://${SERVER_URL}:8001/db
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+
+logging.level:
+  org.hibernate.SQL: debug
+  org.hibernate.orm.jdbc.bind: trace
+
+
+
