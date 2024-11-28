@@ -3,7 +3,7 @@ package com.moblie.management.security.config;
 import com.moblie.management.jwt.JwtFilter;
 import com.moblie.management.jwt.JwtUtil;
 import com.moblie.management.jwt.service.CustomOAuth2UserService;
-import com.moblie.management.jwt.service.CustomSuccessHandler;
+//import com.moblie.management.jwt.service.CustomSuccessHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +32,7 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomSuccessHandler customSuccessHandler;
+//    private final CustomSuccessHandler customSuccessHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -81,8 +81,8 @@ public class SecurityConfig {
         http
                 .oauth2Login((oauth2) -> oauth2
                         .userInfoEndpoint((userInfoEndpointConfig -> userInfoEndpointConfig
-                                .userService(customOAuth2UserService)))
-                        .successHandler(customSuccessHandler));
+                                .userService(customOAuth2UserService))));
+//                        .successHandler(customSuccessHandler));
 //                        .failureHandler());
 
         http
