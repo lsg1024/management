@@ -38,3 +38,4 @@ out/
 
 ### api-key ###
 /src/main/resources/application-secret-key.properties
+/src/main/resources/application-redis.yml

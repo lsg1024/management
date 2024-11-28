@@ -52,10 +52,23 @@ spring:
     console:
       enabled: true
 
+#  data:
+#    redis:
+
+#      host: 127.0.0.1
+#      port: 6379
+
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
+      cluster:
+        nodes:
+          - ${SERVER_URL}:${REDIS_MASTER_PORT_1},
+          - ${SERVER_URL}:${REDIS_MASTER_PORT_2},
+          - ${SERVER_URL}:${REDIS_MASTER_PORT_3},
+          - ${SERVER_URL}:${REDIS_SLAVE_PORT_1},
+          - ${SERVER_URL}:${REDIS_SLAVE_PORT_2},
+          - ${SERVER_URL}:${REDIS_SLAVE_PORT_3}
+        max-redirects: 3
 
 logging.level:
   org.hibernate.SQL: debug
