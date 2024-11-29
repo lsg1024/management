@@ -3,6 +3,9 @@ package com.moblie.management.redis;
 //import io.lettuce.core.SocketOptions;
 //import io.lettuce.core.cluster.ClusterClientOptions;
 //import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
+import io.lettuce.core.SocketOptions;
+import io.lettuce.core.cluster.ClusterClientOptions;
+import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -31,25 +34,33 @@ import java.util.List;
 //
 //    @Bean
 //    public RedisConnectionFactory redisConnectionFactory() {
-//        final List<String> nodes = redisClusterProperties.getNode();
+//        final List<String> nodes = redisClusterProperties.getNodes();
 //        final int maxRedirects = redisClusterProperties.getMaxRedirects();
+//
 //        final List<RedisNode> redisNodes = nodes.stream()
-//                .map(node -> new RedisNode(node.split(":")[0], Integer.parseInt(node.split(":")[1])))
+//                .map(node -> node.replace(",", ""))
+//                .map(node -> {
+//                    String[] parts = node.split(":");
+//                    String host = parts[0];
+//                    int port = Integer.parseInt(parts[1]);
+//                    return new RedisNode(host, port);
+//                })
 //                .toList();
 //
 //        RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
 //        clusterConfiguration.setClusterNodes(redisNodes);
 //        clusterConfiguration.setMaxRedirects(maxRedirects);
 //
+//        // 연결 시간 제한 늘리기
 //        SocketOptions socketOptions = SocketOptions.builder()
-//                .connectTimeout(Duration.ofMillis(100L))
+//                .connectTimeout(Duration.ofMillis(5000L))  // 연결 시간 제한 5초로 설정
 //                .keepAlive(true)
 //                .build();
 //
 //        ClusterTopologyRefreshOptions clusterTopologyRefreshOptions = ClusterTopologyRefreshOptions.builder()
 //                .dynamicRefreshSources(true)
 //                .enableAllAdaptiveRefreshTriggers()
-//                .enablePeriodicRefresh(Duration.ofMillis(30L))
+//                .enablePeriodicRefresh(Duration.ofMinutes(30L))  // 30분마다 토폴로지 새로고침
 //                .build();
 //
 //        ClusterClientOptions clusterClientOptions = ClusterClientOptions.builder()
@@ -57,10 +68,9 @@ import java.util.List;
 //                .socketOptions(socketOptions)
 //                .build();
 //
-//        // (5) Lettuce Client 옵션
 //        LettuceClientConfiguration clientConfiguration = LettuceClientConfiguration.builder()
 //                .clientOptions(clusterClientOptions)
-//                .commandTimeout(Duration.ofMillis(3000L))
+//                .commandTimeout(Duration.ofMillis(5000L))  // 명령어 시간 제한 5초로 설정
 //                .build();
 //
 //        return new LettuceConnectionFactory(clusterConfiguration, clientConfiguration);
