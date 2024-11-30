@@ -75,6 +75,6 @@ logging.level:
   org.hibernate.orm.jdbc.bind: trace
 
 server:
-  port: 8000
+  port: 9000
 
 

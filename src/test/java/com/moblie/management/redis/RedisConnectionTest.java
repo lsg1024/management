@@ -1,6 +1,8 @@
 package com.moblie.management.redis;
 
 import org.junit.jupiter.api.Test;
+//import org.redisson.api.RBucket;
+//import org.redisson.api.RedissonClient;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,7 @@ public class RedisConnectionTest {
 
     @Test
     void testRedisConnection() {
-        String key = "test-key";
+        String key = "{user}:test-key";
         String value = "test-value";
 
         redisTemplate.opsForValue().set(key, value);
@@ -30,7 +32,7 @@ public class RedisConnectionTest {
 
     @Test
     void testRedisKeyDelete() {
-        String key = "test-key";
+        String key = "{user}:test-key";
 
         redisTemplate.delete(key);
     }
