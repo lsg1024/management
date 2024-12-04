@@ -3,14 +3,13 @@ package com.moblie.management.redis.service;
 import com.moblie.management.jwt.JwtUtil;
 import com.moblie.management.jwt.dto.RefreshToken;
 import com.moblie.management.jwt.repository.RefreshRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken;
 
-import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,32 +25,36 @@ class RedisRefreshTokenServiceTest {
     @Autowired
     RefreshRepository refreshRepository;
 
+    private String userid;
+
+    @BeforeEach
+    void createTestUser() {
+        userid = UUID.randomUUID().toString();
+    }
+    
+
     @Test
     void createNewToken() {
         //given
-        String username = "test5";
-        String tokenValue = jwtUtil.createJwt("refresh", username, "test_name", "USER", 259200L);
+        String tokenValue = jwtUtil.createJwt("refresh", userid, "test_name", "USER", 259200L);
 
         // when
-        redisRefreshTokenService.createNewToken(username, tokenValue);
+        redisRefreshTokenService.createNewToken(userid, tokenValue);
 
         // then
-        Optional<RefreshToken> retrievedToken = refreshRepository.findByUsername(username);
+        Optional<RefreshToken> retrievedToken = refreshRepository.findByUsername(userid);
         assertThat(retrievedToken).isNotNull();
-        assertThat(retrievedToken.get().getUsername()).isEqualTo(username);
+        assertThat(retrievedToken.get().getUsername()).isEqualTo(userid);
         assertThat(retrievedToken.get().getTokenValue()).isEqualTo(tokenValue);
     }
 
     @Test
     void removeUserTokens() {
-        //given
-        String username = "test5";
-
         //when
-        redisRefreshTokenService.deleteToken(username);
+        redisRefreshTokenService.deleteToken(userid);
 
         //then
-        Optional<RefreshToken> refreshToken = refreshRepository.findByUsername(username);
+        Optional<RefreshToken> refreshToken = refreshRepository.findByUsername(userid);
         assertThat(refreshToken).isEmpty();
     }
 }
