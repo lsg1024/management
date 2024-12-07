@@ -44,7 +44,7 @@ spring:
   jpa:
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
@@ -65,14 +65,25 @@ spring:
           - ${SERVER_URL}:${REDIS_MASTER_PORT_1},
           - ${SERVER_URL}:${REDIS_MASTER_PORT_2},
           - ${SERVER_URL}:${REDIS_MASTER_PORT_3},
-          - ${SERVER_URL}:${REDIS_SLAVE_PORT_1},
-          - ${SERVER_URL}:${REDIS_SLAVE_PORT_2},
-          - ${SERVER_URL}:${REDIS_SLAVE_PORT_3}
         max-redirects: 3
+
+  mail:
+    host: ${EMAIL_HOST}
+    port: ${EMAIL_PORT}
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.orm.jdbc.bind: trace
+
 
 server:
   port: 9000

@@ -5,4 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
     MemberEntity findByUsernameAndEmail(String username, String email);
+    MemberEntity findByEmail(String email);
+    boolean existsByEmail(String email);
+
+    boolean existsByPassword(String password);
+
 }

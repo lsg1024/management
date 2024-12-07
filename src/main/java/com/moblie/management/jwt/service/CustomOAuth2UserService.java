@@ -34,8 +34,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         if (registrationId.equals("kakao")) {
             oAuth2Response = new KakaoMemberInfoResponse(oAuth2User.getAttributes());
-        }
-        else {
+        } else {
             return null;
         }
 
@@ -52,7 +51,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             findUsernameAndEmail = MemberEntity.builder()
                     .username(username)
                     .email(email)
-                    .role(Role.USER)
+                    .role(Role.WAIT)
                     .build();
 
             memberRepository.save(findUsernameAndEmail);

@@ -18,17 +18,20 @@ public class MemberEntity {
     private String email;
     private String password;
     @Column(unique = true) // oauth 데이터 정보
-    private String username;
+    private String username; // 사용자 플렛폼 정보
+    @Column(unique = true)
+    private String nickname; // 사용자 이름
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @Builder
-    public MemberEntity(Long userid, String email, String password, String username, Role role) {
+    public MemberEntity(Long userid, String email, String password, String username, String nickname, Role role) {
         this.userid = userid;
         this.email = email;
         this.password = password;
         this.username = username;
+        this.nickname = nickname;
         this.role = role;
     }
 

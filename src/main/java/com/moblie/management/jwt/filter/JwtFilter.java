@@ -1,5 +1,6 @@
-package com.moblie.management.jwt;
+package com.moblie.management.jwt.filter;
 
+import com.moblie.management.jwt.JwtUtil;
 import com.moblie.management.jwt.dto.PrincipalDetails;
 import com.moblie.management.member.domain.MemberEntity;
 import com.moblie.management.member.domain.Role;
@@ -52,7 +53,6 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 토큰이 access인지 확인 (발급시 페이로드에 명시)
         String category = jwtUtil.getCategory(accessToken);
 
         if (!category.equals("access")) {
@@ -65,7 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         String id = jwtUtil.getUserId(accessToken);
-        String name = jwtUtil.getName(accessToken);
+        String name = jwtUtil.getNickname(accessToken);
         String role = jwtUtil.getRole(accessToken);
 
         MemberEntity oAuth2UserDto = MemberEntity.builder()
@@ -74,7 +74,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 .role(Role.valueOf(role))
                 .build();
 
-        //UserDetails에 회원 정보 객체 담기
         PrincipalDetails customOAuth2User = new PrincipalDetails(oAuth2UserDto);
 
         // 스프링 시큐리티 인증 auth 토큰 생성

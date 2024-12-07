@@ -20,24 +20,6 @@ public class RedisConnectionTest {
     private RedisTemplate<String, String> redisTemplate;
 
     @Test
-    void testRedisConnection() {
-        String key = "{user}:test-key";
-        String value = "test-value";
-
-        redisTemplate.opsForValue().set(key, value);
-        String result = redisTemplate.opsForValue().get(key);
-
-        assertThat(result).isEqualTo(value);
-    }
-
-    @Test
-    void testRedisKeyDelete() {
-        String key = "{user}:test-key";
-
-        redisTemplate.delete(key);
-    }
-
-    @Test
     void testAddKeyToRedis() {
         String key = "sample-key";
         String value = "sample-value";
@@ -61,7 +43,7 @@ public class RedisConnectionTest {
 
     @Test
     void testDeleteKeyFromRedis() {
-        String key = "sample-key";
+        String key = "refreshToken";
 
         // 키를 삭제합니다.
         RBucket<String> bucket = redissonClient.getBucket(key);

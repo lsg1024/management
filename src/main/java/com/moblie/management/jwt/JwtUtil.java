@@ -25,8 +25,8 @@ public class JwtUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("id", String.class);
     }
 
-    public String getName(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("name", String.class);
+    public String getNickname(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("nickname", String.class);
     }
 
     public String getRole(String token) {
@@ -43,10 +43,10 @@ public class JwtUtil {
         return Jwts.builder()
                 .claim("category", category)
                 .claim("id", id)
-                .claim("username", name)
+                .claim("nickname", name)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis())) // 현재 시간
-                .expiration(new Date(System.currentTimeMillis() + expireTime)) // 만료 시간
+                .expiration(new Date(System.currentTimeMillis() + expireTime * 1000)) // 만료 시간
                 .signWith(secretKey)
                 .compact();
     }

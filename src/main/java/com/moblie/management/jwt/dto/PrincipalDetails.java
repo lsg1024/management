@@ -3,6 +3,7 @@ import com.moblie.management.member.domain.MemberEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+//import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +11,7 @@ import java.util.Map;
 
 public class PrincipalDetails implements UserDetails, OAuth2User {
 
-    private MemberEntity member;
+    private final MemberEntity member;
     private Map<String, Object> attributes;
 
     public PrincipalDetails(MemberEntity member) {
@@ -30,7 +31,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getName() {
-        return member.getUsername();
+        return member.getNickname();
     }
 
     @Override
@@ -38,7 +39,12 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 
         Collection<GrantedAuthority> collection = new ArrayList<>();
 
-        collection.add((GrantedAuthority) () -> member.getRole().toString());
+        collection.add(new GrantedAuthority() {
+            @Override
+            public String getAuthority() {
+                return member.getRole().toString();
+            }
+        });
 
         return collection;
     }
@@ -50,7 +56,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getUsername() {
-        return member.getUsername();
+        return member.getNickname();
     }
 
     public String getId() {
@@ -61,24 +67,5 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
         return member.getRole().toString();
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 
 }

@@ -1,25 +1,28 @@
-package com.moblie.management.security.config;
+package com.moblie.management.config;
 
-import com.moblie.management.jwt.JwtFilter;
+import com.moblie.management.jwt.filter.JwtFilter;
 import com.moblie.management.jwt.JwtUtil;
+import com.moblie.management.jwt.filter.CustomLoginFilter;
+import com.moblie.management.jwt.filter.CustomLogoutFilter;
+import com.moblie.management.jwt.handler.CustomOAuthFailHandler;
+import com.moblie.management.jwt.handler.CustomOAuthSuccessHandler;
 import com.moblie.management.jwt.service.CustomOAuth2UserService;
-//import com.moblie.management.jwt.service.CustomSuccessHandler;
+import com.moblie.management.redis.service.RedisRefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -31,14 +34,21 @@ import java.util.Collections;
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
+    private final AuthenticationConfiguration authenticationConfiguration;
     private final CustomOAuth2UserService customOAuth2UserService;
-//    private final CustomSuccessHandler customSuccessHandler;
+    private final CustomOAuthSuccessHandler customOAuthSuccessHandler;
+    private final CustomOAuthFailHandler customOAuthFailHandler;
+    private final RedisRefreshTokenService redisRefreshTokenService;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -54,8 +64,7 @@ public class SecurityConfig {
                     configuration.setAllowedHeaders(Collections.singletonList("*"));
                     configuration.setMaxAge(3600L);
 
-                    configuration.setExposedHeaders(Collections.singletonList("access"));
-                    configuration.setExposedHeaders(Collections.singletonList("refresh"));
+                    configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
                     return configuration;
                 }
@@ -69,21 +78,27 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable);
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/signup", "/login", "/reissue", "/images/**").permitAll()
+                        .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated());
 
+        http
+                .addFilterBefore(new JwtFilter(jwtUtil), CustomLoginFilter.class);
         //jwt
         http
-                .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, redisRefreshTokenService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(new JwtFilter(jwtUtil), OAuth2LoginAuthenticationFilter.class);
+
+        http
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, redisRefreshTokenService), LogoutFilter.class);
 
         //oauth
         http
                 .oauth2Login((oauth2) -> oauth2
                         .userInfoEndpoint((userInfoEndpointConfig -> userInfoEndpointConfig
-                                .userService(customOAuth2UserService))));
-//                        .successHandler(customSuccessHandler));
-//                        .failureHandler());
+                                .userService(customOAuth2UserService)))
+                        .successHandler(customOAuthSuccessHandler)
+                        .failureHandler(customOAuthFailHandler));
 
         http
                 .sessionManagement((session) -> session
@@ -91,11 +106,6 @@ public class SecurityConfig {
 
         return http.build();
 
-    }
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
 }
