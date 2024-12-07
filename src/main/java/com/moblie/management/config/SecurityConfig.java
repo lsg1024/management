@@ -2,7 +2,7 @@ package com.moblie.management.config;
 
 import com.moblie.management.jwt.filter.JwtFilter;
 import com.moblie.management.jwt.JwtUtil;
-import com.moblie.management.jwt.filter.LoginFilter;
+import com.moblie.management.jwt.filter.CustomLoginFilter;
 import com.moblie.management.jwt.filter.CustomLogoutFilter;
 import com.moblie.management.jwt.handler.CustomOAuthFailHandler;
 import com.moblie.management.jwt.handler.CustomOAuthSuccessHandler;
@@ -83,10 +83,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
 
         http
-                .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
+                .addFilterBefore(new JwtFilter(jwtUtil), CustomLoginFilter.class);
         //jwt
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, redisRefreshTokenService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, redisRefreshTokenService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(new JwtFilter(jwtUtil), OAuth2LoginAuthenticationFilter.class);
 
         http
