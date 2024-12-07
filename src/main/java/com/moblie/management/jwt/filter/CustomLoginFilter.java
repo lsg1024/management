@@ -30,7 +30,7 @@ import static com.moblie.management.member.validation.MemberValidation.*;
 
 @Slf4j
 @RequiredArgsConstructor
-public class LoginFilter extends UsernamePasswordAuthenticationFilter {
+public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final static Long ACCESS_TTL = 900L;
     private final static Long REFRESH_TTL = 259200L;
@@ -39,7 +39,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final RedisRefreshTokenService redisRefreshTokenService;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil, RedisRefreshTokenService redisRefreshTokenService) {
+    public CustomLoginFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil, RedisRefreshTokenService redisRefreshTokenService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.redisRefreshTokenService = redisRefreshTokenService;
