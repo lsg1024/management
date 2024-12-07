@@ -16,13 +16,15 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.moblie.management.member.util.MemberUtil.createCookie;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class MemberController {
 
@@ -58,8 +60,33 @@ public class MemberController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //비밀번호 변경
-//    @PostMapping("")
+    // 인증번호 요청
+    @PostMapping("/certification/send")
+    public ResponseEntity<Response> certificationRequest(@Validated @RequestBody MemberDto.ChangePasswordDto newPasswordDto, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(new Response("인증번호 전송 실패", errors));
+        }
+
+        memberService.sendEmail(newPasswordDto);
+
+        return ResponseEntity.ok(new Response(newPasswordDto.getEmail()));
+    }
+
+    // 인증번호 인증
+    @PostMapping("/certification/authentication")
+    public ResponseEntity<Response> certificationResponse(
+            @RequestParam("email") String email,
+            @RequestParam("certification") String certificationNumber) {
+
+        memberService.checkCertificationNumbers(email, certificationNumber);
+
+        return ResponseEntity.ok(new Response("비밀번호 변경 완료"));
+    }
 
     //회원탈퇴
 

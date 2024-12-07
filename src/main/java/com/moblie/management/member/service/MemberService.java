@@ -7,18 +7,23 @@ import com.moblie.management.member.domain.MemberEntity;
 import com.moblie.management.member.domain.Role;
 import com.moblie.management.member.dto.MemberDto;
 import com.moblie.management.member.repository.MemberRepository;
+import com.moblie.management.redis.domain.CertificationNumberToken;
+import com.moblie.management.redis.service.CertificationNumberService;
 import com.moblie.management.redis.service.RedisRefreshTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 
 import static com.moblie.management.member.validation.MemberValidation.*;
 import static com.moblie.management.redis.validation.TokenValidation.checkRefreshToken;
@@ -36,6 +41,8 @@ public class MemberService {
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder encoder;
     private final MemberRepository memberRepository;
+    private final JavaMailSender javaMailSender;
+    private final CertificationNumberService certificationNumberService;
     private final RedisRefreshTokenService redisRefreshTokenService;
 
     @Transactional
@@ -95,6 +102,52 @@ public class MemberService {
 
         return new String[]{newAccessToken, newRefreshToken};
 
+    }
+
+    public void sendEmail(MemberDto.ChangePasswordDto newPasswordDto) {
+
+        boolean existsByPassword = memberRepository.existsByPassword(encoder.encode(newPasswordDto.getPassword()));
+
+        if (existsByPassword) {
+            throw new CustomException(ErrorCode.REQUEST_FAILED, "동일한 비밀번호는 사용할 수 없습니다.");
+        }
+
+        checkConfirmPassword(newPasswordDto.getPassword(), newPasswordDto.getPassword_confirm());
+
+        Random random = new Random();
+
+        String certificationNumbers = randomNumbers(random);
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+
+        mailMessage.setTo(newPasswordDto.getEmail());
+        mailMessage.setSubject("비밀번호 변경을 위한 인증번호");
+        mailMessage.setText(certificationNumbers);
+
+        certificationNumberService.createToken(newPasswordDto.getEmail(), certificationNumbers, newPasswordDto.getPassword());
+        javaMailSender.send(mailMessage);
+
+    }
+
+    public void checkCertificationNumbers(String email, String certificationNumber) {
+        Optional<CertificationNumberToken> token = certificationNumberService.getToken(email);
+
+        String randomValue = token
+                .map(CertificationNumberToken::getRandomValue)
+                .orElseThrow(() -> new IllegalArgumentException("유효기간이 지났습니다."));
+
+        if (randomValue.equals(certificationNumber)) {
+            
+        }
+    }
+
+    private static String randomNumbers(Random random) {
+        StringBuilder randomNumber = new StringBuilder();
+        for (int i = 0; i < 4; i++) {
+            randomNumber.append(random.nextInt(10));
+        }
+
+        return randomNumber.toString();
     }
 
 }
