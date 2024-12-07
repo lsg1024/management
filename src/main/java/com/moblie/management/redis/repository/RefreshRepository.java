@@ -1,6 +1,6 @@
-package com.moblie.management.jwt.repository;
+package com.moblie.management.redis.repository;
 
-import com.moblie.management.jwt.dto.RefreshToken;
+import com.moblie.management.redis.domain.RefreshToken;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;

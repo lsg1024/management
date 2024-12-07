@@ -1,4 +1,4 @@
-package com.moblie.management.jwt.dto;
+package com.moblie.management.redis.domain;
 
 import lombok.Getter;
 import lombok.Setter;
