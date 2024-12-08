@@ -1,12 +1,7 @@
 package com.moblie.management.redis.service;
 
-import com.moblie.management.member.dto.MemberDto;
 import com.moblie.management.redis.domain.CertificationNumberToken;
-import com.moblie.management.redis.domain.RefreshToken;
 import com.moblie.management.redis.repository.CertificationNumberRepository;
-import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.formula.functions.T;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
