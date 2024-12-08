@@ -1,6 +1,5 @@
 package com.moblie.management.member.controller;
 
-import com.moblie.management.jwt.JwtUtil;
 import com.moblie.management.member.dto.MemberDto;
 import com.moblie.management.member.dto.Response;
 import com.moblie.management.member.service.MemberService;
@@ -8,9 +7,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +23,7 @@ import java.util.Map;
 
 import static com.moblie.management.member.util.MemberUtil.createCookie;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
@@ -44,7 +44,7 @@ public class MemberController {
             return ResponseEntity.badRequest().body(new Response("회원가입 실패", errors));
         }
 
-        memberService.signUpMember(signUp);
+        memberService.signUp(signUp);
 
         return ResponseEntity.ok(new Response("회원가입 완료"));
 
@@ -52,7 +52,18 @@ public class MemberController {
 
     @PostMapping("/reissue")
     public ResponseEntity<?> reissueToken(HttpServletRequest request, HttpServletResponse response) {
-        String[] tokens = memberService.reissueRefreshToken(request);
+        String refresh = null;
+
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("refreshToken")) {
+                refresh = cookie.getValue();
+                log.info("cookie refresh {}", refresh);
+            }
+        }
+
+
+        String[] tokens = memberService.reissueRefreshToken(refresh);
 
         response.setHeader("Authorization", "Bearer " + tokens[0]);
         response.addCookie(createCookie("refreshToken", tokens[1], REFRESH_TTL.intValue()));
