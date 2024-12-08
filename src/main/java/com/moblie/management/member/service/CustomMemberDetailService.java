@@ -30,10 +30,10 @@ public class CustomMemberDetailService implements UserDetailsService {
 
         log.info("members.getRole(): {}", members.getRole());
 
-        if ("WAIT".equals(String.valueOf(members.getRole()))) {
-            log.info("미승인 사용자입니다: {}", email);
-            throw new UsernameNotFoundException("미승인 사용자입니다: " + email);
-        }
+//        if ("WAIT".equals(String.valueOf(members.getRole()))) {
+//            log.info("미승인 사용자입니다: {}", email);
+//            throw new UsernameNotFoundException("미승인 사용자입니다: " + email);
+//        }
 
         log.info("사용자 인증 성공: {}, {}", email, members.getPassword());
         return new PrincipalDetails(members);

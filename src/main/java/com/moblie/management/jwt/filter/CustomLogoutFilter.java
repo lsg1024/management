@@ -74,15 +74,15 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
 
-        String nickname = jwtUtil.getNickname(refresh);
-        boolean isExist = redisRefreshTokenService.existsToken(nickname);
+        String email = jwtUtil.getEmail(refresh);
+        boolean isExist = redisRefreshTokenService.existsToken(email);
         if (!isExist) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
 
-        redisRefreshTokenService.deleteToken(nickname);
+        redisRefreshTokenService.deleteToken(email);
 
-        Cookie cookie = createCookie(nickname, null, 0);
+        Cookie cookie = createCookie(email, null, 0);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
