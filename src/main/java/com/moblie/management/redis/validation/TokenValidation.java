@@ -5,8 +5,8 @@ import com.moblie.management.exception.ErrorCode;
 
 public class TokenValidation {
 
-    public static void checkRefreshToken(String nickname) {
-        if (nickname == null) {
+    public static void checkRefreshToken(String email) {
+        if (email == null) {
             throw new CustomException(ErrorCode.ERROR_400, "유효하지 않은 토큰 값입니다.");
         }
     }
