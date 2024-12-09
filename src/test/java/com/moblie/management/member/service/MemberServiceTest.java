@@ -5,8 +5,11 @@ import com.moblie.management.jwt.JwtUtil;
 import com.moblie.management.member.domain.MemberEntity;
 import com.moblie.management.member.dto.MemberDto;
 import com.moblie.management.member.repository.MemberRepository;
+import com.moblie.management.redis.domain.CertificationNumberToken;
 import com.moblie.management.redis.domain.RefreshToken;
+import com.moblie.management.redis.service.CertificationNumberService;
 import com.moblie.management.redis.service.RedisRefreshTokenService;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +17,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
+@TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 class MemberServiceTest {
 
     @Autowired
@@ -33,11 +36,14 @@ class MemberServiceTest {
     @Autowired
     private RedisRefreshTokenService redisRefreshTokenService;
 
+    @Autowired
+    private CertificationNumberService certificationNumberService;
+
     @BeforeEach
-    @DisplayName("테스트 용 Member 생성")
+    @DisplayName("테스트용 Member 생성")
     void init(){
         MemberDto.SignUp memberDto = new MemberDto.SignUp();
-        memberDto.setEmail("test@gamil.com");
+        memberDto.setEmail("test@gmail.com");
         memberDto.setNickname("memberTestUser");
         memberDto.setPassword("test_password");
         memberDto.setPassword_confirm("test_password");
@@ -54,7 +60,7 @@ class MemberServiceTest {
     @DisplayName("회원가입 성공")
     void signUpMemberSuccess() {
         //given
-        boolean existsByEmail = memberRepository.existsByEmail("test@gamil.com");
+        boolean existsByEmail = memberRepository.existsByEmail("test@gmail.com");
 
         //then
         assertTrue(existsByEmail);
@@ -65,7 +71,7 @@ class MemberServiceTest {
     void signUpMemberFail() {
         //given
         MemberDto.SignUp memberDto = new MemberDto.SignUp();
-        memberDto.setEmail("test@gamil.com");
+        memberDto.setEmail("test@gmail.com");
         memberDto.setNickname("memberTestUser");
         memberDto.setPassword("test_password");
         memberDto.setPassword_confirm("test_password");
@@ -77,26 +83,72 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("토큰 재발급")
-    void reissueRefreshToken() {
+    void reissueRefreshTokenSuccess() {
         //given
-        MemberEntity member = memberRepository.findByEmail("test@gamil.com");
+        MemberEntity member = memberRepository.findByEmail("test@gmail.com");
 
         //when
         String refresh = jwtUtil.createJwt("refresh", member.getUserid().toString(), member.getEmail(), member.getRole().toString(), 1000L);
-        redisRefreshTokenService.createNewToken("test@gamil.com", refresh);
+        redisRefreshTokenService.createNewToken(member.getEmail(), refresh);
 
         String[] tokens = memberService.reissueRefreshToken(refresh);
-        assertSame(tokens.length, 2);
 
-        log.info(tokens[0] + " " + tokens[1]);
-
-        Optional<RefreshToken> refreshToken = redisRefreshTokenService.get("test@gamil.com");
+        //then
+        Optional<RefreshToken> refreshToken = redisRefreshTokenService.get(member.getEmail());
         String email = refreshToken.get().getEmail();
         String tokenValue = refreshToken.get().getTokenValue();
 
-        log.info("email: {} tokenValue: {}", email, tokenValue);
+        assertEquals(email, member.getEmail());
+        assertEquals(tokens[1], tokenValue);
 
-        redisRefreshTokenService.deleteToken("test@gamil.com");
+        redisRefreshTokenService.deleteToken(member.getEmail());
+    }
+
+    @Test
+    @DisplayName("토큰 발급 실패")
+    void reissueRefreshTokenFail() {
+        //given
+        MemberEntity member = memberRepository.findByEmail("test@gmail.com");
+
+        //when
+        String refresh = jwtUtil.createJwt("refresh", member.getUserid().toString(), member.getEmail(), member.getRole().toString(), -1L);
+        redisRefreshTokenService.createNewToken(member.getEmail(), refresh);
+
+        //then
+        assertThrows(ExpiredJwtException.class, () -> memberService.reissueRefreshToken(refresh));
+
+    }
+
+    @Test
+    @DisplayName("이메일 전송 성공")
+    @Order(1)
+    void sendEmailSuccess() {
+        //given
+        MemberDto.CertificationDto newMemberDto = new MemberDto.CertificationDto();
+        newMemberDto.setEmail("zksqazwsx@gmail.com");
+
+        //when
+        memberService.sendEmail(newMemberDto);
+
+        //then
+        Optional<CertificationNumberToken> token = certificationNumberService.getToken(newMemberDto.getEmail());
+        assertEquals(token.get().getEmail(), newMemberDto.getEmail());
+
+    }
+
+    @Test
+    @DisplayName("인증번호 인증 성공")
+    @Order(2)
+    void certificationSuccess() {
+        //given
+        MemberDto.CertificationDto newMemberDto = new MemberDto.CertificationDto();
+        newMemberDto.setEmail("zksqazwsx@gmail.com");
+
+        Optional<CertificationNumberToken> token = certificationNumberService.getToken(newMemberDto.getEmail());
+
+        //when & then
+        assertDoesNotThrow(() -> memberService.certificationNumbers(token.get().getEmail(), token.get().getRandomValue()));
+
     }
 
 }
