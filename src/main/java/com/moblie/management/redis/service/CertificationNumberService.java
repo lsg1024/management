@@ -16,16 +16,15 @@ public class CertificationNumberService extends RedisCrudService<CertificationNu
         this.certificationNumberRepository = certificationNumberRepository;
     }
 
-    public void createToken(String username, String certificationNumbers, String newPassword) {
+    public void createToken(String email, String certificationNumbers) {
         CertificationNumberToken certificationNumberToken = new CertificationNumberToken();
-        certificationNumberToken.setUsername(username);
+        certificationNumberToken.setEmail(email);
         certificationNumberToken.setRandomValue(certificationNumbers);
-        certificationNumberToken.setPassword(newPassword);
         create(certificationNumberToken);
     }
 
-    public Optional<CertificationNumberToken> getToken(String username) {
-        return get(username);
+    public Optional<CertificationNumberToken> getToken(String email) {
+        return get(email);
     }
 
     public void deleteToken(String username) {

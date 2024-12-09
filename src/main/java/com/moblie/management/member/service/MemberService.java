@@ -11,8 +11,6 @@ import com.moblie.management.redis.domain.CertificationNumberToken;
 import com.moblie.management.redis.service.CertificationNumberService;
 import com.moblie.management.redis.service.RedisRefreshTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
@@ -23,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 import static com.moblie.management.member.validation.MemberValidation.*;
 import static com.moblie.management.redis.validation.TokenValidation.checkRefreshToken;
@@ -84,15 +83,7 @@ public class MemberService {
 
     }
 
-    public void sendEmail(MemberDto.ChangePasswordDto newPasswordDto) {
-
-        boolean existsByPassword = memberRepository.existsByPassword(encoder.encode(newPasswordDto.getPassword()));
-
-        if (existsByPassword) {
-            throw new CustomException(ErrorCode.ERROR_400, "동일한 비밀번호는 사용할 수 없습니다.");
-        }
-
-        checkConfirmPassword(newPasswordDto.getPassword(), newPasswordDto.getPassword_confirm());
+    public void sendEmail(MemberDto.CertificationDto newPasswordDto) {
 
         Random random = new Random();
 
@@ -102,14 +93,16 @@ public class MemberService {
 
         mailMessage.setTo(newPasswordDto.getEmail());
         mailMessage.setSubject("비밀번호 변경을 위한 인증번호");
-        mailMessage.setText(certificationNumbers);
+        mailMessage.setText("유효시간은 3분 입니다.\n" + certificationNumbers);
 
-        certificationNumberService.createToken(newPasswordDto.getEmail(), certificationNumbers, newPasswordDto.getPassword());
+        log.info("certificationNumbers {}", certificationNumbers);
+
+        certificationNumberService.createToken(newPasswordDto.getEmail(), certificationNumbers);
         javaMailSender.send(mailMessage);
 
     }
 
-    public void checkCertificationNumbers(String email, String certificationNumber) {
+    public String certificationNumbers(String email, String certificationNumber) {
         Optional<CertificationNumberToken> token = certificationNumberService.getToken(email);
 
         String randomValue = token
@@ -120,8 +113,17 @@ public class MemberService {
             throw new CustomException(ErrorCode.ERROR_404, "번호가 일치하지 않습니다");
         }
 
+        UUID uuid = UUID.randomUUID();
+
+        certificationNumberService.createToken(email, String.valueOf(uuid));
+
+        return String.valueOf(uuid);
     }
 
+    public void updatePassword(String email, String token) {
+
+    }
+    
     private String verificationRefreshToken(String refresh) {
         log.info("verificationRefreshToken email 정보 {}", jwtUtil.getEmail(refresh));
         checkRefreshToken(jwtUtil.getEmail(refresh));
@@ -147,5 +149,6 @@ public class MemberService {
 
         return randomNumber.toString();
     }
+
 
 }

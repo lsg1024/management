@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,9 +72,9 @@ public class MemberController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // 인증번호 요청
-    @PostMapping("/certification/send")
-    public ResponseEntity<Response> certificationRequest(@Validated @RequestBody MemberDto.ChangePasswordDto newPasswordDto, BindingResult bindingResult) {
+    //인증번호 요청
+    @PostMapping("/signin/find/password/email")
+    public ResponseEntity<Response> certificationRequest(@Validated @RequestBody MemberDto.CertificationDto certificationDto, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
@@ -83,20 +84,31 @@ public class MemberController {
             return ResponseEntity.badRequest().body(new Response("인증번호 전송 실패", errors));
         }
 
-        memberService.sendEmail(newPasswordDto);
+        memberService.sendEmail(certificationDto);
 
-        return ResponseEntity.ok(new Response(newPasswordDto.getEmail()));
+        return ResponseEntity.ok(new Response(certificationDto.getEmail()));
     }
 
-    // 인증번호 인증
-    @PostMapping("/certification/authentication")
-    public ResponseEntity<Response> certificationResponse(
+    //인증번호 인증
+    @PostMapping("/signin/find/password/email/certification")
+    public ResponseEntity<Response> emailCertification(
             @RequestParam("email") String email,
             @RequestParam("certification") String certificationNumber) {
 
-        memberService.checkCertificationNumbers(email, certificationNumber);
+        String uuid = memberService.certificationNumbers(email, certificationNumber);
 
-        return ResponseEntity.ok(new Response("비밀번호 변경 완료"));
+        return ResponseEntity.ok(new Response("인증 완료:" + uuid));
+    }
+
+    //비밀번호 변경
+    @PostMapping("/signin/update/password")
+    public ResponseEntity<Response> updatePassword(
+            @RequestParam("email") String email,
+            @RequestParam("token") String token) {
+
+        memberService.updatePassword(email, token);
+
+        return ResponseEntity.ok(new Response("변경 완료"));
     }
 
     //회원탈퇴
