@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,11 +40,13 @@ class MemberServiceTest {
     @Autowired
     private CertificationNumberService certificationNumberService;
 
+    private final static String EMAIL = "test@gmail.com";
+
     @BeforeEach
     @DisplayName("테스트용 Member 생성")
     void init(){
         MemberDto.SignUp memberDto = new MemberDto.SignUp();
-        memberDto.setEmail("test@gmail.com");
+        memberDto.setEmail(EMAIL);
         memberDto.setNickname("memberTestUser");
         memberDto.setPassword("test_password");
         memberDto.setPassword_confirm("test_password");
@@ -60,7 +63,7 @@ class MemberServiceTest {
     @DisplayName("회원가입 성공")
     void signUpMemberSuccess() {
         //given
-        boolean existsByEmail = memberRepository.existsByEmail("test@gmail.com");
+        boolean existsByEmail = memberRepository.existsByEmail(EMAIL);
 
         //then
         assertTrue(existsByEmail);
@@ -71,7 +74,7 @@ class MemberServiceTest {
     void signUpMemberFail() {
         //given
         MemberDto.SignUp memberDto = new MemberDto.SignUp();
-        memberDto.setEmail("test@gmail.com");
+        memberDto.setEmail(EMAIL);
         memberDto.setNickname("memberTestUser");
         memberDto.setPassword("test_password");
         memberDto.setPassword_confirm("test_password");
@@ -85,7 +88,7 @@ class MemberServiceTest {
     @DisplayName("토큰 재발급")
     void reissueRefreshTokenSuccess() {
         //given
-        MemberEntity member = memberRepository.findByEmail("test@gmail.com");
+        MemberEntity member = memberRepository.findByEmail(EMAIL);
 
         //when
         String refresh = jwtUtil.createJwt("refresh", member.getUserid().toString(), member.getEmail(), member.getRole().toString(), 1000L);
@@ -108,7 +111,7 @@ class MemberServiceTest {
     @DisplayName("토큰 발급 실패")
     void reissueRefreshTokenFail() {
         //given
-        MemberEntity member = memberRepository.findByEmail("test@gmail.com");
+        MemberEntity member = memberRepository.findByEmail(EMAIL);
 
         //when
         String refresh = jwtUtil.createJwt("refresh", member.getUserid().toString(), member.getEmail(), member.getRole().toString(), -1L);
@@ -124,7 +127,7 @@ class MemberServiceTest {
     @Order(1)
     void sendEmailSuccess() {
         //given
-        MemberDto.CertificationDto newMemberDto = new MemberDto.CertificationDto();
+        MemberDto.Certification newMemberDto = new MemberDto.Certification();
         newMemberDto.setEmail("zksqazwsx@gmail.com");
 
         //when
@@ -141,7 +144,7 @@ class MemberServiceTest {
     @Order(2)
     void certificationSuccess() {
         //given
-        MemberDto.CertificationDto newMemberDto = new MemberDto.CertificationDto();
+        MemberDto.Certification newMemberDto = new MemberDto.Certification();
         newMemberDto.setEmail("zksqazwsx@gmail.com");
 
         Optional<CertificationNumberToken> token = certificationNumberService.getToken(newMemberDto.getEmail());
@@ -150,5 +153,66 @@ class MemberServiceTest {
         assertDoesNotThrow(() -> memberService.certificationNumbers(token.get().getEmail(), token.get().getRandomValue()));
 
     }
+
+    @Test
+    @DisplayName("비밀번호 변경 성공")
+    void updatePasswordSuccess() {
+        // given
+        MemberEntity member = memberRepository.findByEmail(EMAIL);
+        String bfPassword = member.getPassword();
+        UUID uuid = UUID.randomUUID();
+
+        MemberDto.UpdatePassword passwordDto = new MemberDto.UpdatePassword();
+        passwordDto.setPassword("new_password");
+        passwordDto.setPassword_confirm("new_password");
+
+        // when
+        certificationNumberService.createToken(member.getEmail(), String.valueOf(uuid));
+        memberService.updatePassword(member.getEmail(), String.valueOf(uuid), passwordDto);
+
+        // then
+        MemberEntity updatedMember = memberRepository.findByEmail(member.getEmail());
+        assertNotEquals(bfPassword, updatedMember.getPassword());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 (dto 불일치)")
+    void updateInconsistencyPassword() {
+        //given
+        MemberEntity member = memberRepository.findByEmail(EMAIL);
+        UUID uuid = UUID.randomUUID();
+
+        MemberDto.UpdatePassword passwordDto = new MemberDto.UpdatePassword();
+        passwordDto.setPassword("new_password");
+        passwordDto.setPassword_confirm("not_new_password");
+
+        //when
+        certificationNumberService.createToken(member.getEmail(), String.valueOf(uuid));
+
+        //then
+        assertThrows(CustomException.class, () ->
+                memberService.updatePassword(member.getEmail(), String.valueOf(uuid), passwordDto));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 (token 만료)")
+    void updateExistToken() {
+        //given
+        MemberEntity member = memberRepository.findByEmail(EMAIL);
+        UUID uuid = UUID.randomUUID();
+        MemberDto.UpdatePassword passwordDto = new MemberDto.UpdatePassword();
+        passwordDto.setPassword("new_password");
+        passwordDto.setPassword_confirm("new_password");
+
+        //when
+        certificationNumberService.createToken(member.getEmail(), String.valueOf(uuid));
+        certificationNumberService.deleteToken(member.getEmail());
+
+        //then
+        assertThrows(CustomException.class, () ->
+                memberService.updatePassword(member.getEmail(), String.valueOf(uuid), passwordDto));
+    }
+
+
 
 }
