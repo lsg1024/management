@@ -27,8 +27,8 @@ public class CertificationNumberService extends RedisCrudService<CertificationNu
         return get(email);
     }
 
-    public void deleteToken(String username) {
-        delete(username);
+    public void deleteToken(String email) {
+        delete(email);
     }
 
 }

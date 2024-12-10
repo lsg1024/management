@@ -53,8 +53,8 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             ObjectMapper objectMapper = new ObjectMapper();
             MemberDto.SignIn signInRequest = objectMapper.readValue(request.getInputStream(), MemberDto.SignIn.class);
 
-            checkEmail(signInRequest.getEmail());
-            checkPassword(signInRequest.getPassword());
+            validateEmail(signInRequest.getEmail());
+            validatePassword(signInRequest.getPassword());
 
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword(), null);
