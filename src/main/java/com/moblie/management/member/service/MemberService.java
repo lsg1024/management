@@ -24,8 +24,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import static com.moblie.management.member.validation.MemberValidation.*;
-import static com.moblie.management.redis.validation.TokenValidation.checkRefreshToken;
-import static com.moblie.management.redis.validation.TokenValidation.checkRefreshTokenType;
+import static com.moblie.management.redis.validation.TokenValidation.*;
 
 @Service
 @Slf4j
@@ -52,7 +51,11 @@ public class MemberService {
             throw new CustomException(ErrorCode.ERROR_400, "이미 가입된 이메일 정보 입니다.");
         }
 
-        checkConfirmPassword(signUp.getPassword(), signUp.getPassword_confirm());
+        if (memberRepository.existsByNickname(signUp.getNickname())) {
+            throw new CustomException(ErrorCode.ERROR_400, "동일한 이름이 존재합니다.");
+        }
+
+        validateConfirmPassword(signUp.getPassword(), signUp.getPassword_confirm());
 
         MemberEntity member = MemberEntity.builder()
                 .email(signUp.getEmail())
@@ -83,7 +86,7 @@ public class MemberService {
 
     }
 
-    public void sendEmail(MemberDto.CertificationDto newPasswordDto) {
+    public void sendEmail(MemberDto.Certification newPasswordDto) {
 
         Random random = new Random();
 
@@ -95,8 +98,6 @@ public class MemberService {
         mailMessage.setSubject("비밀번호 변경을 위한 인증번호");
         mailMessage.setText("유효시간은 3분 입니다.\n" + certificationNumbers);
 
-        log.info("certificationNumbers {}", certificationNumbers);
-
         certificationNumberService.createToken(newPasswordDto.getEmail(), certificationNumbers);
         javaMailSender.send(mailMessage);
 
@@ -105,13 +106,9 @@ public class MemberService {
     public String certificationNumbers(String email, String certificationNumber) {
         Optional<CertificationNumberToken> token = certificationNumberService.getToken(email);
 
-        String randomValue = token
-                .map(CertificationNumberToken::getRandomValue)
-                .orElseThrow(() -> new IllegalArgumentException("유효기간이 지났습니다."));
+        String redisCertificationToken = validToken(token);
 
-        if (!randomValue.equals(certificationNumber)) {
-            throw new CustomException(ErrorCode.ERROR_404, "번호가 일치하지 않습니다");
-        }
+        validateCertificationNumber(redisCertificationToken, certificationNumber);
 
         UUID uuid = UUID.randomUUID();
 
@@ -120,25 +117,58 @@ public class MemberService {
         return String.valueOf(uuid);
     }
 
-    public void updatePassword(String email, String token) {
+    @Transactional
+    public void updatePassword(String email, String token, MemberDto.UpdatePassword passwordDto) {
+        Optional<CertificationNumberToken> certification_token = certificationNumberService.getToken(email);
 
+        String redisCertificationToken = validToken(certification_token);
+
+        validateCertificationNumber(redisCertificationToken, token);
+
+        MemberEntity member = memberRepository.findByEmail(email);
+
+        validateConfirmPassword(passwordDto.getPassword(), passwordDto.getPassword_confirm());
+        member.updatePassword(encoder.encode(passwordDto.getPassword()));
+
+        certificationNumberService.deleteToken(email);
     }
-    
+
+    @Transactional
+    public void deleteMember(String userid, MemberDto.DeleteMember memberDto) {
+        Optional<MemberEntity> member = Optional.of(memberRepository.findById(Long.valueOf(userid))
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404)));
+
+        boolean passwordMatch = encoder.matches(member.get().getPassword(), memberDto.getPassword());
+
+        if (!passwordMatch) {
+            throw new CustomException(ErrorCode.ERROR_400, "잘못된 비밀번호 입니다.");
+        }
+
+        redisRefreshTokenService.deleteToken(member.get().getEmail());
+
+        member.get().softDelete();
+    }
+
     private String verificationRefreshToken(String refresh) {
-        log.info("verificationRefreshToken email 정보 {}", jwtUtil.getEmail(refresh));
-        checkRefreshToken(jwtUtil.getEmail(refresh));
+        validateRefreshToken(jwtUtil.getEmail(refresh));
 
         try {
             jwtUtil.isExpired(refresh);
         } catch (ExpiredJwtException e) {
-            throw new CustomException(ErrorCode.ERROR_400, "Refresh 토큰 만료");
+            throw new CustomException(ErrorCode.ERROR_401, "Refresh 토큰 만료");
         }
 
         String category = jwtUtil.getCategory(refresh);
 
-        checkRefreshTokenType(category);
+        validateRefreshTokenType(category);
 
         return refresh;
+    }
+
+    private String validToken(Optional<CertificationNumberToken> token) {
+        return token
+                .map(CertificationNumberToken::getRandomValue)
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_401, "유효기간이 지났습니다."));
     }
 
     private static String randomNumbers(Random random) {
@@ -146,9 +176,7 @@ public class MemberService {
         for (int i = 0; i < 4; i++) {
             randomNumber.append(random.nextInt(10));
         }
-
         return randomNumber.toString();
     }
-
 
 }

@@ -6,21 +6,13 @@ import com.moblie.management.member.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.view.RedirectView;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.*;
 
 import static com.moblie.management.member.util.MemberUtil.createCookie;
 
@@ -34,16 +26,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public ResponseEntity<Response> singUp(@Validated @RequestBody MemberDto.SignUp signUp, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
-
-            return ResponseEntity.badRequest().body(new Response("회원가입 실패", errors));
-        }
+    public ResponseEntity<Response> singUp(@RequestBody @Valid  MemberDto.SignUp signUp) {
 
         memberService.signUp(signUp);
 
@@ -62,8 +45,6 @@ public class MemberController {
                 log.info("cookie refresh {}", refresh);
             }
         }
-
-
         String[] tokens = memberService.reissueRefreshToken(refresh);
 
         response.setHeader("Authorization", "Bearer " + tokens[0]);
@@ -74,23 +55,15 @@ public class MemberController {
 
     //인증번호 요청
     @PostMapping("/signin/find/password/email")
-    public ResponseEntity<Response> certificationRequest(@Validated @RequestBody MemberDto.CertificationDto certificationDto, BindingResult bindingResult) {
+    public ResponseEntity<Response> certificationRequest(@RequestBody @Valid MemberDto.Certification certification) {
 
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
-            return ResponseEntity.badRequest().body(new Response("인증번호 전송 실패", errors));
-        }
+        memberService.sendEmail(certification);
 
-        memberService.sendEmail(certificationDto);
-
-        return ResponseEntity.ok(new Response(certificationDto.getEmail()));
+        return ResponseEntity.ok(new Response(certification.getEmail()));
     }
 
     //인증번호 인증
-    @PostMapping("/signin/find/password/email/certification")
+    @PostMapping("/signin/find/password/certification")
     public ResponseEntity<Response> emailCertification(
             @RequestParam("email") String email,
             @RequestParam("certification") String certificationNumber) {
@@ -101,17 +74,27 @@ public class MemberController {
     }
 
     //비밀번호 변경
-    @PostMapping("/signin/update/password")
+    @PostMapping("/signin/find/password")
     public ResponseEntity<Response> updatePassword(
             @RequestParam("email") String email,
-            @RequestParam("token") String token) {
+            @RequestParam("token") String token,
+            @RequestBody @Valid MemberDto.UpdatePassword passwordDto) {
 
-        memberService.updatePassword(email, token);
+        memberService.updatePassword(email, token, passwordDto);
 
         return ResponseEntity.ok(new Response("변경 완료"));
     }
 
-    //회원탈퇴
+    //회원탈퇴 (추가 비밀번호 인증 -> 세션 제거 -> redisToken 제거 -> soft delete)
+    @DeleteMapping("/mypage/{userid}")
+    public ResponseEntity<Response> deleteMember(
+            @PathVariable("userid") String userid,
+            @RequestBody @Valid MemberDto.DeleteMember memberDto) {
+
+        memberService.deleteMember(userid, memberDto);
+
+        return ResponseEntity.ok(new Response("회원 탈퇴 완료"));
+    }
 
     /*
        관리자 전용 명령어 ADMIN
