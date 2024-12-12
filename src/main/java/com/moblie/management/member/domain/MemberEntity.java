@@ -12,7 +12,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Table(name = "members")
-@SQLDelete(sql = "UPDATE MEMBERS set DELETED = true where USERID = false")
+@SQLDelete(sql = "UPDATE MEMBERS set DELETED = true where USERID = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberEntity {
 
@@ -54,7 +54,6 @@ public class MemberEntity {
     }
     public void softDelete() {
         this.deleted = true;
-        this.email = "deleted_user_" + UUID.randomUUID() + "@delete.com"; ;
         this.password = UUID.randomUUID().toString();
         this.username = null;
         this.nickname = "탈퇴한 사용자-" + UUID.randomUUID();
