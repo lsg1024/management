@@ -10,17 +10,17 @@ import com.moblie.management.redis.domain.RefreshToken;
 import com.moblie.management.redis.service.CertificationNumberService;
 import com.moblie.management.redis.service.RedisRefreshTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
+import static com.moblie.management.member.util.MemberUtil.randomNumbers;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Slf4j
 @SpringBootTest
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 class MemberServiceTest {
@@ -57,6 +57,7 @@ class MemberServiceTest {
     @AfterEach
     void clearAll() {
         memberRepository.deleteAll();
+        memberRepository.deletePermanentlyDeletedMember();
     }
 
     @Test
@@ -127,11 +128,13 @@ class MemberServiceTest {
     @Order(1)
     void sendEmailSuccess() {
         //given
+        Random random = new Random();
         MemberDto.Certification newMemberDto = new MemberDto.Certification();
         newMemberDto.setEmail("zksqazwsx@gmail.com");
 
         //when
-        memberService.sendEmail(newMemberDto);
+        String certificationNumbers = randomNumbers(random);
+        certificationNumberService.createToken(newMemberDto.getEmail(), certificationNumbers);
 
         //then
         Optional<CertificationNumberToken> token = certificationNumberService.getToken(newMemberDto.getEmail());
@@ -213,6 +216,29 @@ class MemberServiceTest {
                 memberService.updatePassword(member.getEmail(), String.valueOf(uuid), passwordDto));
     }
 
+    @Test
+    @DisplayName("회원 삭제 (soft delete)")
+    void deleteMemberSuccess() {
+        //given
+        MemberEntity member = memberRepository.findByEmail(EMAIL);
+        MemberDto.DeleteMember memberDto = new MemberDto.DeleteMember("test_password");
 
+        //when
+        memberService.deleteMember(String.valueOf(member.getUserid()), memberDto);
+        MemberEntity softDeleteMember = memberRepository.findSoftDeleteMember(EMAIL);
 
+        //then
+        assertNull(softDeleteMember.getUsername());
+    }
+
+    @Test
+    @DisplayName("회원 삭제 (비밀번호 틀림)")
+    void deleteMemberFailWrongPassword() {
+        //given
+        MemberEntity member = memberRepository.findByEmail(EMAIL);
+        MemberDto.DeleteMember memberDto = new MemberDto.DeleteMember("wrong_password");
+
+        //when & then
+        assertThrows(CustomException.class, () -> memberService.deleteMember(String.valueOf(member.getUserid()), memberDto));
+    }
 }
