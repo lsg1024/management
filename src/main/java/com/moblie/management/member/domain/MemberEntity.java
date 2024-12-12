@@ -5,10 +5,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+
+import java.util.UUID;
 
 @Entity
-@Table(name = "members")
 @Getter
+@Table(name = "members")
+@SQLDelete(sql = "UPDATE MEMBERS set DELETED = true where USERID = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberEntity {
 
@@ -21,9 +25,9 @@ public class MemberEntity {
     private String username; // 사용자 플렛폼 정보
     @Column(unique = true)
     private String nickname; // 사용자 이름
-
     @Enumerated(EnumType.STRING)
     private Role role;
+    private boolean deleted = false;
 
     @Builder
     public MemberEntity(Long userid, String email, String password, String username, String nickname, Role role) {
@@ -38,13 +42,20 @@ public class MemberEntity {
     public boolean isUserNameExist() {
         return username != null;
     }
-
     public boolean isEmailExist() {
         return email != null;
     }
-
     public void updateUserNameAndEmail(String username, String email) {
         this.username = username;
         this.email = email;
+    }
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+    public void softDelete() {
+        this.deleted = true;
+        this.password = UUID.randomUUID().toString();
+        this.username = null;
+        this.nickname = "탈퇴한 사용자-" + UUID.randomUUID();
     }
 }

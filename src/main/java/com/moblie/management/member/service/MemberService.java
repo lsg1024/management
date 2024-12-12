@@ -11,8 +11,6 @@ import com.moblie.management.redis.domain.CertificationNumberToken;
 import com.moblie.management.redis.service.CertificationNumberService;
 import com.moblie.management.redis.service.RedisRefreshTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
@@ -25,9 +23,9 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import static com.moblie.management.member.util.MemberUtil.randomNumbers;
 import static com.moblie.management.member.validation.MemberValidation.*;
-import static com.moblie.management.redis.validation.TokenValidation.checkRefreshToken;
-import static com.moblie.management.redis.validation.TokenValidation.checkRefreshTokenType;
+import static com.moblie.management.redis.validation.TokenValidation.*;
 
 @Service
 @Slf4j
@@ -46,15 +44,19 @@ public class MemberService {
     private final RedisRefreshTokenService redisRefreshTokenService;
 
     @Transactional
-    public void signUpMember(MemberDto.SignUp signUp) {
+    public void signUp(MemberDto.SignUp signUp) {
 
         String email = signUp.getEmail().toLowerCase();
 
         if (memberRepository.existsByEmail(email)) {
-            throw new CustomException(ErrorCode.EMAIL_DUPLICATE_FAILED);
+            throw new CustomException(ErrorCode.ERROR_400, "이미 가입된 이메일 정보 입니다.");
         }
 
-        checkConfirmPassword(signUp.getPassword(), signUp.getPassword_confirm());
+        if (memberRepository.existsByNickname(signUp.getNickname())) {
+            throw new CustomException(ErrorCode.ERROR_400, "동일한 이름이 존재합니다.");
+        }
+
+        validateConfirmPassword(signUp.getPassword(), signUp.getPassword_confirm());
 
         MemberEntity member = MemberEntity.builder()
                 .email(signUp.getEmail())
@@ -67,52 +69,25 @@ public class MemberService {
     }
 
     @Transactional
-    public String[] reissueRefreshToken(HttpServletRequest request) {
-
+    public String[] reissueRefreshToken(String refreshToken) {
         log.info("reissueRefreshToken");
-        String refresh = null;
 
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("refreshToken")) {
-                refresh = cookie.getValue();
-            }
-        }
-
-        checkRefreshToken(jwtUtil.getNickname(refresh));
-
-        try {
-            jwtUtil.isExpired(refresh);
-        } catch (ExpiredJwtException e) {
-            throw new CustomException(ErrorCode.REQUEST_FAILED, "Refresh 토큰 만료");
-        }
-
-        String category = jwtUtil.getCategory(refresh);
-
-        checkRefreshTokenType(category);
+        String refresh = verificationRefreshToken(refreshToken);
 
         String id = jwtUtil.getUserId(refresh);
-        String nickname = jwtUtil.getNickname(refresh);
+        String email = jwtUtil.getEmail(refresh);
         String role = jwtUtil.getRole(refresh);
 
-        String newAccessToken = jwtUtil.createJwt("access", id, nickname, role, ACCESS_TTL);
-        String newRefreshToken = jwtUtil.createJwt("refresh", id, nickname, role, REFRESH_TTL);
+        String newAccessToken = jwtUtil.createJwt("access", id, email, role, ACCESS_TTL);
+        String newRefreshToken = jwtUtil.createJwt("refresh", id, email, role, REFRESH_TTL);
 
-        redisRefreshTokenService.updateNewToken(nickname, newRefreshToken);
+        redisRefreshTokenService.updateNewToken(email, newRefreshToken);
 
         return new String[]{newAccessToken, newRefreshToken};
 
     }
 
-    public void sendEmail(MemberDto.ChangePasswordDto newPasswordDto) {
-
-        boolean existsByPassword = memberRepository.existsByPassword(encoder.encode(newPasswordDto.getPassword()));
-
-        if (existsByPassword) {
-            throw new CustomException(ErrorCode.REQUEST_FAILED, "동일한 비밀번호는 사용할 수 없습니다.");
-        }
-
-        checkConfirmPassword(newPasswordDto.getPassword(), newPasswordDto.getPassword_confirm());
+    public void sendEmail(MemberDto.Certification newPasswordDto) {
 
         Random random = new Random();
 
@@ -122,32 +97,79 @@ public class MemberService {
 
         mailMessage.setTo(newPasswordDto.getEmail());
         mailMessage.setSubject("비밀번호 변경을 위한 인증번호");
-        mailMessage.setText(certificationNumbers);
+        mailMessage.setText("유효시간은 3분 입니다.\n" + certificationNumbers);
 
-        certificationNumberService.createToken(newPasswordDto.getEmail(), certificationNumbers, newPasswordDto.getPassword());
+        certificationNumberService.createToken(newPasswordDto.getEmail(), certificationNumbers);
         javaMailSender.send(mailMessage);
 
     }
 
-    public void checkCertificationNumbers(String email, String certificationNumber) {
+    public String certificationNumbers(String email, String certificationNumber) {
         Optional<CertificationNumberToken> token = certificationNumberService.getToken(email);
 
-        String randomValue = token
-                .map(CertificationNumberToken::getRandomValue)
-                .orElseThrow(() -> new IllegalArgumentException("유효기간이 지났습니다."));
+        String redisCertificationToken = validToken(token);
 
-        if (randomValue.equals(certificationNumber)) {
-            
-        }
+        validateCertificationNumber(redisCertificationToken, certificationNumber);
+
+        UUID uuid = UUID.randomUUID();
+
+        certificationNumberService.createToken(email, String.valueOf(uuid));
+
+        return String.valueOf(uuid);
     }
 
-    private static String randomNumbers(Random random) {
-        StringBuilder randomNumber = new StringBuilder();
-        for (int i = 0; i < 4; i++) {
-            randomNumber.append(random.nextInt(10));
+    @Transactional
+    public void updatePassword(String email, String token, MemberDto.UpdatePassword passwordDto) {
+        Optional<CertificationNumberToken> certification_token = certificationNumberService.getToken(email);
+
+        String redisCertificationToken = validToken(certification_token);
+
+        validateCertificationNumber(redisCertificationToken, token);
+
+        MemberEntity member = memberRepository.findByEmail(email);
+
+        validateConfirmPassword(passwordDto.getPassword(), passwordDto.getPassword_confirm());
+        member.updatePassword(encoder.encode(passwordDto.getPassword()));
+
+        certificationNumberService.deleteToken(email);
+    }
+
+    @Transactional
+    public void deleteMember(String userid, MemberDto.DeleteMember memberDto) {
+        Optional<MemberEntity> member = Optional.of(memberRepository.findById(Long.valueOf(userid))
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404)));
+
+        boolean passwordMatch = encoder.matches(memberDto.getPassword(), member.get().getPassword());
+
+        if (!passwordMatch) {
+            throw new CustomException(ErrorCode.ERROR_400, "잘못된 비밀번호 입니다.");
         }
 
-        return randomNumber.toString();
+        redisRefreshTokenService.deleteToken(member.get().getEmail());
+
+        member.get().softDelete();
+    }
+
+    private String verificationRefreshToken(String refresh) {
+        validateRefreshToken(jwtUtil.getEmail(refresh));
+
+        try {
+            jwtUtil.isExpired(refresh);
+        } catch (ExpiredJwtException e) {
+            throw new CustomException(ErrorCode.ERROR_401, "Refresh 토큰 만료");
+        }
+
+        String category = jwtUtil.getCategory(refresh);
+
+        validateRefreshTokenType(category);
+
+        return refresh;
+    }
+
+    private String validToken(Optional<CertificationNumberToken> token) {
+        return token
+                .map(CertificationNumberToken::getRandomValue)
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_401, "유효기간이 지났습니다."));
     }
 
 }

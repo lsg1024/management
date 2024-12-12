@@ -1,29 +1,22 @@
 package com.moblie.management.member.controller;
 
-import com.moblie.management.jwt.JwtUtil;
 import com.moblie.management.member.dto.MemberDto;
 import com.moblie.management.member.dto.Response;
 import com.moblie.management.member.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.*;
 
 import static com.moblie.management.member.util.MemberUtil.createCookie;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
@@ -33,18 +26,9 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public ResponseEntity<Response> singUp(@Validated @RequestBody MemberDto.SignUp signUp, BindingResult bindingResult) {
+    public ResponseEntity<Response> singUp(@RequestBody @Valid  MemberDto.SignUp signUp) {
 
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
-
-            return ResponseEntity.badRequest().body(new Response("회원가입 실패", errors));
-        }
-
-        memberService.signUpMember(signUp);
+        memberService.signUp(signUp);
 
         return ResponseEntity.ok(new Response("회원가입 완료"));
 
@@ -52,7 +36,16 @@ public class MemberController {
 
     @PostMapping("/reissue")
     public ResponseEntity<?> reissueToken(HttpServletRequest request, HttpServletResponse response) {
-        String[] tokens = memberService.reissueRefreshToken(request);
+        String refresh = null;
+
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("refreshToken")) {
+                refresh = cookie.getValue();
+                log.info("cookie refresh {}", refresh);
+            }
+        }
+        String[] tokens = memberService.reissueRefreshToken(refresh);
 
         response.setHeader("Authorization", "Bearer " + tokens[0]);
         response.addCookie(createCookie("refreshToken", tokens[1], REFRESH_TTL.intValue()));
@@ -60,35 +53,48 @@ public class MemberController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // 인증번호 요청
-    @PostMapping("/certification/send")
-    public ResponseEntity<Response> certificationRequest(@Validated @RequestBody MemberDto.ChangePasswordDto newPasswordDto, BindingResult bindingResult) {
+    //인증번호 요청
+    @PostMapping("/signin/find/password/email")
+    public ResponseEntity<Response> certificationRequest(@RequestBody @Valid MemberDto.Certification certification) {
 
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
-            return ResponseEntity.badRequest().body(new Response("인증번호 전송 실패", errors));
-        }
+        memberService.sendEmail(certification);
 
-        memberService.sendEmail(newPasswordDto);
-
-        return ResponseEntity.ok(new Response(newPasswordDto.getEmail()));
+        return ResponseEntity.ok(new Response(certification.getEmail()));
     }
 
-    // 인증번호 인증
-    @PostMapping("/certification/authentication")
-    public ResponseEntity<Response> certificationResponse(
+    //인증번호 인증
+    @PostMapping("/signin/find/password/certification")
+    public ResponseEntity<Response> emailCertification(
             @RequestParam("email") String email,
             @RequestParam("certification") String certificationNumber) {
 
-        memberService.checkCertificationNumbers(email, certificationNumber);
+        String uuid = memberService.certificationNumbers(email, certificationNumber);
 
-        return ResponseEntity.ok(new Response("비밀번호 변경 완료"));
+        return ResponseEntity.ok(new Response("인증 완료:" + uuid));
     }
 
-    //회원탈퇴
+    //비밀번호 변경
+    @PostMapping("/signin/find/password")
+    public ResponseEntity<Response> updatePassword(
+            @RequestParam("email") String email,
+            @RequestParam("token") String token,
+            @RequestBody @Valid MemberDto.UpdatePassword passwordDto) {
+
+        memberService.updatePassword(email, token, passwordDto);
+
+        return ResponseEntity.ok(new Response("변경 완료"));
+    }
+
+    //회원탈퇴 (추가 비밀번호 인증 -> 세션 제거 -> redisToken 제거 -> soft delete)
+    @DeleteMapping("/mypage/{userid}")
+    public ResponseEntity<Response> deleteMember(
+            @PathVariable("userid") String userid,
+            @RequestBody @Valid MemberDto.DeleteMember memberDto) {
+
+        memberService.deleteMember(userid, memberDto);
+
+        return ResponseEntity.ok(new Response("회원 탈퇴 완료"));
+    }
 
     /*
        관리자 전용 명령어 ADMIN

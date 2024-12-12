@@ -2,11 +2,19 @@ package com.moblie.management.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
-@Getter
+import java.util.Map;
+
+@Getter @Setter
 @AllArgsConstructor
 public class ErrorResponse {
     private int status;
-    private String errorCode;
     private String message;
+    private Map<String, String> details;
+
+    public ErrorResponse(int status, String message) {
+        this.status = status;
+        this.message = message;
+    }
 }

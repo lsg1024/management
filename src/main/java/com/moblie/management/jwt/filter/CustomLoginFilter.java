@@ -53,15 +53,15 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             ObjectMapper objectMapper = new ObjectMapper();
             MemberDto.SignIn signInRequest = objectMapper.readValue(request.getInputStream(), MemberDto.SignIn.class);
 
-            checkEmail(signInRequest.getEmail());
-            checkPassword(signInRequest.getPassword());
+            validateEmail(signInRequest.getEmail());
+            validatePassword(signInRequest.getPassword());
 
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword(), null);
 
             return authenticationManager.authenticate(authToken);
         } catch (IOException e) {
-            throw new CustomException(ErrorCode.REQUEST_FAILED, "Json 형식이 잘못되었습니다.");
+            throw new CustomException(ErrorCode.ERROR_400, "Json 형식이 잘못되었습니다.");
         }
 
     }
@@ -77,11 +77,11 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         String role = auth.getAuthority();
 
         // 토큰 생성
-        String accessToken = jwtUtil.createJwt("access", customUserDetails.getId(), customUserDetails.getUsername(), role, ACCESS_TTL);
-        String refreshToken = jwtUtil.createJwt("refresh", customUserDetails.getId(), customUserDetails.getUsername(), role, REFRESH_TTL);
+        String accessToken = jwtUtil.createJwt("access", customUserDetails.getId(), customUserDetails.getEmail(), role, ACCESS_TTL);
+        String refreshToken = jwtUtil.createJwt("refresh", customUserDetails.getId(), customUserDetails.getEmail(), role, REFRESH_TTL);
 
         // 리프레시 토큰 DB 저장
-        redisRefreshTokenService.createNewToken(customUserDetails.getUsername(), refreshToken);
+        redisRefreshTokenService.createNewToken(customUserDetails.getEmail(), refreshToken);
 
         // 응답 헤더 및 쿠키 설정
         ObjectMapper objectMapper = new ObjectMapper();

@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @Getter
 public enum ErrorCode {
-    USERNAME_DUPLICATED(HttpStatus.CONFLICT, ""),
-    USERNAME_NOT_FOUND(HttpStatus.NOT_FOUND, ""),
-    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, ""),
-    EMAIL_DUPLICATE_FAILED(HttpStatus.BAD_REQUEST, "이미 가입된 사용자 이메일 입니다."),
-    REQUEST_FAILED(HttpStatus.BAD_REQUEST, "");
+
+    ERROR_409(HttpStatus.CONFLICT, "이미 존재하는 리소스입니다."),
+    ERROR_404(HttpStatus.NOT_FOUND, "리소스를 찾을 수 없습니다."),
+    ERROR_401(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
+    ERROR_400(HttpStatus.BAD_REQUEST, "잘못된 요청입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

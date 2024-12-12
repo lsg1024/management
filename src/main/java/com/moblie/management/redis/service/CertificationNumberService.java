@@ -1,12 +1,7 @@
 package com.moblie.management.redis.service;
 
-import com.moblie.management.member.dto.MemberDto;
 import com.moblie.management.redis.domain.CertificationNumberToken;
-import com.moblie.management.redis.domain.RefreshToken;
 import com.moblie.management.redis.repository.CertificationNumberRepository;
-import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.formula.functions.T;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -21,20 +16,19 @@ public class CertificationNumberService extends RedisCrudService<CertificationNu
         this.certificationNumberRepository = certificationNumberRepository;
     }
 
-    public void createToken(String username, String certificationNumbers, String newPassword) {
+    public void createToken(String email, String certificationNumbers) {
         CertificationNumberToken certificationNumberToken = new CertificationNumberToken();
-        certificationNumberToken.setUsername(username);
+        certificationNumberToken.setEmail(email);
         certificationNumberToken.setRandomValue(certificationNumbers);
-        certificationNumberToken.setPassword(newPassword);
         create(certificationNumberToken);
     }
 
-    public Optional<CertificationNumberToken> getToken(String username) {
-        return get(username);
+    public Optional<CertificationNumberToken> getToken(String email) {
+        return get(email);
     }
 
-    public void deleteToken(String username) {
-        delete(username);
+    public void deleteToken(String email) {
+        delete(email);
     }
 
 }

@@ -1,8 +1,8 @@
 package com.moblie.management.redis.service;
 
 import com.moblie.management.jwt.JwtUtil;
-import com.moblie.management.jwt.dto.RefreshToken;
-import com.moblie.management.jwt.repository.RefreshRepository;
+import com.moblie.management.redis.domain.RefreshToken;
+import com.moblie.management.redis.repository.RefreshRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,25 +36,25 @@ class RedisRefreshTokenServiceTest {
     @Test
     void createNewToken() {
         //given
-        String tokenValue = jwtUtil.createJwt("refresh", userid, "test_name", "USER", 259200L);
+        String tokenValue = jwtUtil.createJwt("refresh", userid, "test@gamil.com", "USER", 259200L);
 
         // when
         redisRefreshTokenService.createNewToken(userid, tokenValue);
 
         // then
-        Optional<RefreshToken> retrievedToken = refreshRepository.findByUsername(userid);
+        Optional<RefreshToken> retrievedToken = refreshRepository.findByEmail(userid);
         assertThat(retrievedToken).isNotNull();
-        assertThat(retrievedToken.get().getUsername()).isEqualTo(userid);
+        assertThat(retrievedToken.get().getEmail()).isEqualTo("test@gamil.com");
         assertThat(retrievedToken.get().getTokenValue()).isEqualTo(tokenValue);
     }
 
     @Test
     void removeUserTokens() {
         //when
-        redisRefreshTokenService.deleteToken(userid);
+        redisRefreshTokenService.deleteToken("zks1415@naver.com");
 
         //then
-        Optional<RefreshToken> refreshToken = refreshRepository.findByUsername(userid);
+        Optional<RefreshToken> refreshToken = refreshRepository.findByEmail(userid);
         assertThat(refreshToken).isEmpty();
     }
 }
