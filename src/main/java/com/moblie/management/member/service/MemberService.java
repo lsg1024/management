@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import static com.moblie.management.member.util.MemberUtil.randomNumbers;
 import static com.moblie.management.member.validation.MemberValidation.*;
 import static com.moblie.management.redis.validation.TokenValidation.*;
 
@@ -138,7 +139,7 @@ public class MemberService {
         Optional<MemberEntity> member = Optional.of(memberRepository.findById(Long.valueOf(userid))
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404)));
 
-        boolean passwordMatch = encoder.matches(member.get().getPassword(), memberDto.getPassword());
+        boolean passwordMatch = encoder.matches(memberDto.getPassword(), member.get().getPassword());
 
         if (!passwordMatch) {
             throw new CustomException(ErrorCode.ERROR_400, "잘못된 비밀번호 입니다.");
@@ -169,14 +170,6 @@ public class MemberService {
         return token
                 .map(CertificationNumberToken::getRandomValue)
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_401, "유효기간이 지났습니다."));
-    }
-
-    private static String randomNumbers(Random random) {
-        StringBuilder randomNumber = new StringBuilder();
-        for (int i = 0; i < 4; i++) {
-            randomNumber.append(random.nextInt(10));
-        }
-        return randomNumber.toString();
     }
 
 }
