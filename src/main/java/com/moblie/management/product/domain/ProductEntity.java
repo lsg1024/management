@@ -1,9 +1,11 @@
 package com.moblie.management.product.domain;
 
 import com.moblie.management.exception.CustomException;
+import com.moblie.management.product.dto.ProductDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
@@ -32,7 +34,7 @@ public class ProductEntity {
     private String productNote;
     @Column(unique = true)
     private String productBarcodeNumber;
-    private final boolean deleted = false;
+    private boolean deleted = false;
 
     @Builder
     public ProductEntity(String productName, String productClassification, String productMaterial, String productColor, String productWeight, String productNote, String productBarcodeNumber) {
@@ -43,6 +45,20 @@ public class ProductEntity {
         this.productWeight = productWeight;
         this.productNote = productNote;
         this.productBarcodeNumber = productBarcodeNumber;
+    }
+
+    public void productUpdate(ProductDto.productUpdate productUpdate) {
+        this.productName = productUpdate.getProductName();
+//        this.factory = productUpdate.getFactory();
+        this.productClassification = productUpdate.getModelClassification();
+        this.productMaterial = productUpdate.getGoldType();
+        this.productColor = productUpdate.getGoldColor();
+        this.productWeight = productUpdate.getModelWeight();
+        this.productNote = productUpdate.getModelNote();
+    }
+
+    public void delete() {
+        this.deleted = true;
     }
 
 }

@@ -1,6 +1,11 @@
 package com.moblie.management.product.dto;
 
 import com.moblie.management.product.domain.ProductEntity;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +17,8 @@ public class ProductDto {
     @Getter @Setter
     @NoArgsConstructor
     public static class createProduct {
+
+        @NotEmpty(message = "제품 이름을 입력해주세요.")
         private String modelName;
         private String factory;
         private String modelClassification;
@@ -45,7 +52,28 @@ public class ProductDto {
     }
 
     public static class productsInfo {
+        @Valid @NotNull
         public List<createProduct> products;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class productUpdate {
+
+        @NotBlank(message = "상품 이름을 입력해주세요.")
+        private String productName;
+//        @NotBlank(message = "공장을 선택해주세요.")
+//        private String factory;
+        @NotBlank(message = "상품 유형을 선택해주세요.")
+        private String modelClassification;
+        @NotBlank(message = "상품 재질을 선택해주세요.")
+        private String goldType;
+        @NotBlank(message = "상품 색상을 선택해주세요.")
+        private String goldColor;
+        @NotBlank(message = "상품 무게를 입력해주세요.")
+        private String modelWeight;
+        private String modelNote;
+
     }
 
 }
