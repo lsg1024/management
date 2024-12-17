@@ -1,7 +1,9 @@
 package com.moblie.management.product.domain;
 
-import com.moblie.management.exception.CustomException;
+import com.moblie.management.factory.domain.FactoryEntity;
+import com.moblie.management.product.dto.ProductDto;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -18,8 +20,10 @@ public class ProductEntity {
 
     @Column(unique = true, nullable = false)
     private String productName;
-//    @Column(nullable = false)
-//    private FactoryEntity factory;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "factoryId")
+    private FactoryEntity factory;
 
     @Column(nullable = false)
     private String productClassification;
@@ -32,17 +36,32 @@ public class ProductEntity {
     private String productNote;
     @Column(unique = true)
     private String productBarcodeNumber;
-    private final boolean deleted = false;
+    private boolean deleted = false;
 
     @Builder
-    public ProductEntity(String productName, String productClassification, String productMaterial, String productColor, String productWeight, String productNote, String productBarcodeNumber) {
+    public ProductEntity(String productName, FactoryEntity factory, String productClassification, String productMaterial, String productColor, String productWeight, String productNote, String productBarcodeNumber) {
         this.productName = productName;
+        this.factory = factory;
         this.productClassification = productClassification;
         this.productMaterial = productMaterial;
         this.productColor = productColor;
         this.productWeight = productWeight;
         this.productNote = productNote;
         this.productBarcodeNumber = productBarcodeNumber;
+    }
+
+    public void productUpdate(ProductDto.productUpdate productUpdate) {
+        this.productName = productUpdate.getProductName();
+//        this.factory = productUpdate.getFactory();
+        this.productClassification = productUpdate.getModelClassification();
+        this.productMaterial = productUpdate.getGoldType();
+        this.productColor = productUpdate.getGoldColor();
+        this.productWeight = productUpdate.getModelWeight();
+        this.productNote = productUpdate.getModelNote();
+    }
+
+    public void delete() {
+        this.deleted = true;
     }
 
 }

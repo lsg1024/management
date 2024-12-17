@@ -86,9 +86,9 @@ public class MemberController {
     }
 
     //회원탈퇴 (추가 비밀번호 인증 -> 세션 제거 -> redisToken 제거 -> soft delete)
-    @DeleteMapping("/mypage/{userid}")
+    @DeleteMapping("/mypage")
     public ResponseEntity<Response> deleteMember(
-            @PathVariable("userid") String userid,
+            @RequestParam("userid") String userid,
             @RequestBody @Valid MemberDto.DeleteMember memberDto) {
 
         memberService.deleteMember(userid, memberDto);

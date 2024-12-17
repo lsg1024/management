@@ -6,10 +6,7 @@ import com.moblie.management.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -21,7 +18,7 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping("/new/products")
+    @PostMapping("/products/new")
     public ResponseEntity<Response> uploadExcelFile(@RequestParam MultipartFile file) throws IOException {
 
         List<String> errors = productService.createAutoProduct(file);
@@ -33,11 +30,32 @@ public class ProductController {
         return ResponseEntity.ok(new Response("저장완료"));
     }
 
-    @PostMapping("new/product")
-    public ResponseEntity<Response> createProduct(@RequestBody @Valid ProductDto.createProduct products) {
+    @PostMapping("/product/new")
+    public ResponseEntity<Response> createProduct(@RequestBody @Valid ProductDto.productsInfo productsInfo) {
 
+        List<String> errors = productService.createManualProduct(productsInfo);
+
+        if (!errors.isEmpty()) {
+            return ResponseEntity.ok(new Response("중복 데이터가 존재합니다", errors));
+        }
 
         return ResponseEntity.ok(new Response("저장 완료"));
+    }
+
+    @PostMapping("/product/{productId}/edit")
+    public ResponseEntity<Response> updateProduct(
+            @PathVariable("productId") String productId,
+            @RequestBody @Valid ProductDto.productUpdate updateDto) {
+
+        productService.updateProduct(productId, updateDto);
+
+        return ResponseEntity.ok(new Response("수정 완료"));
+    }
+
+    @DeleteMapping("/product/{productId}")
+    public ResponseEntity<Response> deleteProduct(@PathVariable String productId) {
+        productService.deletedProduct(productId);
+        return ResponseEntity.ok(new Response("삭제 완료"));
     }
 
 }
