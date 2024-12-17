@@ -1,6 +1,5 @@
-package com.moblie.management.product.excel;
+package com.moblie.management.utils;
 
-import com.moblie.management.product.dto.ProductDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -13,11 +12,9 @@ import org.jsoup.select.Elements;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
-public class ExcelSheetUtils {
+public class ExcelSheetUtil {
 
     public static Workbook getSheets(MultipartFile file) throws IOException {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -42,43 +39,6 @@ public class ExcelSheetUtils {
             workbook = convertHtmlToWorkbook(file);
         }
         return workbook;
-    }
-
-    public static void formatProductExcelData(Sheet workSheet, ProductDto.productsInfo productsInfo, List<Integer> targetColum) {
-
-        productsInfo.products = new ArrayList<>();
-
-        for (int i = 1; i < workSheet.getPhysicalNumberOfRows(); i++) {
-            Row row = workSheet.getRow(i);
-
-            if (row == null) continue;
-
-            List<String> columnValues = targetColum.stream()
-                    .map(index -> extractedExcelCellData(row, index))
-                    .toList();
-
-            ProductDto.createProduct product = new ProductDto.createProduct(
-                    columnValues.get(0), // modelNumber
-                    columnValues.get(1), // factory
-                    columnValues.get(2), // modelClassification
-                    columnValues.get(3), // goldType
-                    columnValues.get(4), // goldColor
-                    columnValues.get(5), // modelWeight
-                    columnValues.get(6)  // modelComment
-            );
-
-            log.info("formatProductExcelData product {}", product);
-
-            productsInfo.products.add(product);
-
-        }
-
-        log.info("formatProductExcelData productInfo data {}", productsInfo.products.size());
-    }
-
-    private static String extractedExcelCellData(Row row, int target) {
-        Cell cell = row.getCell(target);
-        return cell != null ? cell.getStringCellValue() : null; 
     }
 
     // Html 데이터 테이블 읽어오기
