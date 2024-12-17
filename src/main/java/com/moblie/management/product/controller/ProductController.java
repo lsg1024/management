@@ -42,9 +42,9 @@ public class ProductController {
         return ResponseEntity.ok(new Response("저장 완료"));
     }
 
-    @PostMapping("/product/edit")
+    @PostMapping("/product/{productId}/edit")
     public ResponseEntity<Response> updateProduct(
-            @RequestParam("productId") String productId,
+            @PathVariable("productId") String productId,
             @RequestBody @Valid ProductDto.productUpdate updateDto) {
 
         productService.updateProduct(productId, updateDto);
