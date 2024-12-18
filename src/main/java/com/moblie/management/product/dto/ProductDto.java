@@ -1,6 +1,7 @@
 package com.moblie.management.product.dto;
 
 import com.moblie.management.factory.domain.FactoryEntity;
+import com.moblie.management.member.domain.MemberEntity;
 import com.moblie.management.product.domain.ProductEntity;
 import com.querydsl.core.annotations.QueryProjection;
 import jakarta.validation.Valid;
@@ -40,7 +41,7 @@ public class ProductDto {
             this.modelNote = modelNote;
         }
 
-        public ProductEntity toEntity(FactoryEntity factory) {
+        public ProductEntity toEntity(FactoryEntity factory, MemberEntity member) {
             return ProductEntity.builder()
                     .productName(modelName)
                     .productBarcodeNumber(modelBarcode)
@@ -50,6 +51,7 @@ public class ProductDto {
                     .productWeight(modelWeight)
                     .productNote(modelNote)
                     .factory(factory)
+                    .member(member)
                     .build();
         }
     }
