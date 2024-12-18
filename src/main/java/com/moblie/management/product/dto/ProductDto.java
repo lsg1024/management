@@ -2,6 +2,7 @@ package com.moblie.management.product.dto;
 
 import com.moblie.management.factory.domain.FactoryEntity;
 import com.moblie.management.product.domain.ProductEntity;
+import com.querydsl.core.annotations.QueryProjection;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -76,6 +77,37 @@ public class ProductDto {
         private String modelWeight;
         private String modelNote;
 
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class productCondition {
+        private String productName;
+        private String factory;
+        private String modelClassification;
+
+    }
+
+    @Getter @Setter
+    public static class productSearchResult {
+        private String modelName;
+        private String factory;
+        private String modelClassification;
+        private String goldType;
+        private String goldColor;
+        private String modelWeight;
+        private String modelNote;
+
+        @QueryProjection
+        public productSearchResult(String modelName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
+            this.modelName = modelName;
+            this.factory = factory;
+            this.modelClassification = modelClassification;
+            this.goldType = goldType;
+            this.goldColor = goldColor;
+            this.modelWeight = modelWeight;
+            this.modelNote = modelNote;
+        }
     }
 
 }
