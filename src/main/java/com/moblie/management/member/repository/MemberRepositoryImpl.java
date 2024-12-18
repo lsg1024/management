@@ -3,7 +3,6 @@ package com.moblie.management.member.repository;
 import com.moblie.management.member.domain.MemberEntity;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import org.springframework.transaction.annotation.Transactional;
 
 import static com.moblie.management.member.domain.QMemberEntity.*;
 
