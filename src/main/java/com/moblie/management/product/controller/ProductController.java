@@ -1,10 +1,15 @@
 package com.moblie.management.product.controller;
 
 import com.moblie.management.member.dto.Response;
+import com.moblie.management.product.domain.ProductEntity;
 import com.moblie.management.product.dto.ProductDto;
 import com.moblie.management.product.service.ProductService;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,6 +55,22 @@ public class ProductController {
         productService.updateProduct(productId, updateDto);
 
         return ResponseEntity.ok(new Response("수정 완료"));
+    }
+
+    @GetMapping("/product/search")
+    public Page<ProductDto.productSearchResult> searchProduct(
+            @RequestParam("product") String productName,
+            @RequestParam("factory") String factoryName,
+            @RequestParam("classification") String classification,
+            @PageableDefault(size = 16)Pageable pageable) {
+
+        ProductDto.productCondition condition = new ProductDto.productCondition(
+                productName,
+                factoryName,
+                classification
+        );
+
+        return productService.searchProduct(condition, pageable);
     }
 
     @DeleteMapping("/product/{productId}")
