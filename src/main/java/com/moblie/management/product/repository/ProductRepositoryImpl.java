@@ -24,6 +24,17 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
         this.query = new JPAQueryFactory(em);
     }
 
+    @Override
+    public boolean existsByProductNameAndMember(String memberId, String productId) {
+        return query
+                .selectOne()
+                .from(productEntity)
+                .where(
+                        productEntity.productId.eq(Long.valueOf(productId))
+                                .and(productEntity.member.userid.eq(Long.valueOf(memberId)))
+                                .and(productEntity.deleted.eq(false)))
+                .fetchFirst() != null;
+    }
 
     /**
      * @param condition productName, factoryName, classification

@@ -11,5 +11,6 @@ import java.util.List;
 
 public interface ProductRepositoryCustom {
 
+    boolean existsByProductNameAndMember(String memberId, String productName);
     Page<ProductDto.productSearchResult> searchProduct(ProductDto.productCondition condition, Pageable pageable);
 }
