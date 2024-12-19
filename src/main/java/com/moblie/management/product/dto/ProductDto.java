@@ -1,7 +1,9 @@
 package com.moblie.management.product.dto;
 
 import com.moblie.management.factory.domain.FactoryEntity;
+import com.moblie.management.member.domain.MemberEntity;
 import com.moblie.management.product.domain.ProductEntity;
+import com.querydsl.core.annotations.QueryProjection;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -20,7 +22,7 @@ public class ProductDto {
     public static class createProduct {
 
         @NotEmpty(message = "제품 이름을 입력해주세요.")
-        private String modelName;
+        private String productName;
         private String factory;
         private String modelClassification;
         private String goldType;
@@ -29,8 +31,8 @@ public class ProductDto {
         private String modelNote;
         private String modelBarcode;
 
-        public createProduct(String modelName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
-            this.modelName = modelName;
+        public createProduct(String productName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
+            this.productName = productName;
             this.factory = factory;
             this.modelClassification = modelClassification;
             this.goldType = goldType;
@@ -39,9 +41,9 @@ public class ProductDto {
             this.modelNote = modelNote;
         }
 
-        public ProductEntity toEntity(FactoryEntity factory) {
+        public ProductEntity toEntity(FactoryEntity factory, MemberEntity member) {
             return ProductEntity.builder()
-                    .productName(modelName)
+                    .productName(productName)
                     .productBarcodeNumber(modelBarcode)
                     .productClassification(modelClassification)
                     .productMaterial(goldType)
@@ -49,6 +51,7 @@ public class ProductDto {
                     .productWeight(modelWeight)
                     .productNote(modelNote)
                     .factory(factory)
+                    .member(member)
                     .build();
         }
     }
@@ -76,6 +79,37 @@ public class ProductDto {
         private String modelWeight;
         private String modelNote;
 
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class productCondition {
+        private String productName;
+        private String factory;
+        private String modelClassification;
+
+    }
+
+    @Getter @Setter
+    public static class productSearchResult {
+        private String modelName;
+        private String factory;
+        private String modelClassification;
+        private String goldType;
+        private String goldColor;
+        private String modelWeight;
+        private String modelNote;
+
+        @QueryProjection
+        public productSearchResult(String modelName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
+            this.modelName = modelName;
+            this.factory = factory;
+            this.modelClassification = modelClassification;
+            this.goldType = goldType;
+            this.goldColor = goldColor;
+            this.modelWeight = modelWeight;
+            this.modelNote = modelNote;
+        }
     }
 
 }

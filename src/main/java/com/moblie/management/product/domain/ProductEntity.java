@@ -1,6 +1,7 @@
 package com.moblie.management.product.domain;
 
 import com.moblie.management.factory.domain.FactoryEntity;
+import com.moblie.management.member.domain.MemberEntity;
 import com.moblie.management.product.dto.ProductDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -20,11 +21,6 @@ public class ProductEntity {
 
     @Column(unique = true, nullable = false)
     private String productName;
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "factoryId")
-    private FactoryEntity factory;
-
     @Column(nullable = false)
     private String productClassification;
     @Column(nullable = false)
@@ -37,11 +33,18 @@ public class ProductEntity {
     @Column(unique = true)
     private String productBarcodeNumber;
     private boolean deleted = false;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "factoryId", nullable = false)
+    private FactoryEntity factory;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", nullable = false)
+    private MemberEntity member;
 
     @Builder
-    public ProductEntity(String productName, FactoryEntity factory, String productClassification, String productMaterial, String productColor, String productWeight, String productNote, String productBarcodeNumber) {
+    public ProductEntity(String productName, FactoryEntity factory, MemberEntity member ,String productClassification, String productMaterial, String productColor, String productWeight, String productNote, String productBarcodeNumber) {
         this.productName = productName;
         this.factory = factory;
+        this.member = member;
         this.productClassification = productClassification;
         this.productMaterial = productMaterial;
         this.productColor = productColor;
@@ -50,9 +53,9 @@ public class ProductEntity {
         this.productBarcodeNumber = productBarcodeNumber;
     }
 
-    public void productUpdate(ProductDto.productUpdate productUpdate) {
+    public void productUpdate(ProductDto.productUpdate productUpdate, FactoryEntity factory) {
         this.productName = productUpdate.getProductName();
-//        this.factory = productUpdate.getFactory();
+        this.factory = factory;
         this.productClassification = productUpdate.getModelClassification();
         this.productMaterial = productUpdate.getGoldType();
         this.productColor = productUpdate.getGoldColor();
