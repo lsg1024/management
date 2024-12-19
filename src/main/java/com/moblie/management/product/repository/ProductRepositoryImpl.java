@@ -25,7 +25,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
     }
 
     @Override
-    public boolean existsByProductNameAndMember(String memberId, String productId) {
+    public boolean existsByMemberIdAndProductId(String memberId, String productId) {
         return query
                 .selectOne()
                 .from(productEntity)
