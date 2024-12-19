@@ -22,7 +22,7 @@ public class ProductDto {
     public static class createProduct {
 
         @NotEmpty(message = "제품 이름을 입력해주세요.")
-        private String modelName;
+        private String productName;
         private String factory;
         private String modelClassification;
         private String goldType;
@@ -31,8 +31,8 @@ public class ProductDto {
         private String modelNote;
         private String modelBarcode;
 
-        public createProduct(String modelName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
-            this.modelName = modelName;
+        public createProduct(String productName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
+            this.productName = productName;
             this.factory = factory;
             this.modelClassification = modelClassification;
             this.goldType = goldType;
@@ -43,7 +43,7 @@ public class ProductDto {
 
         public ProductEntity toEntity(FactoryEntity factory, MemberEntity member) {
             return ProductEntity.builder()
-                    .productName(modelName)
+                    .productName(productName)
                     .productBarcodeNumber(modelBarcode)
                     .productClassification(modelClassification)
                     .productMaterial(goldType)
