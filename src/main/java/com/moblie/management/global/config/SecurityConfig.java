@@ -1,5 +1,6 @@
 package com.moblie.management.global.config;
 
+import com.moblie.management.global.config.handler.CustomAccessDeniedHandler;
 import com.moblie.management.global.jwt.filter.JwtFilter;
 import com.moblie.management.global.jwt.JwtUtil;
 import com.moblie.management.global.jwt.filter.CustomLoginFilter;
@@ -37,6 +38,7 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomOAuthSuccessHandler customOAuthSuccessHandler;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomOAuthFailHandler customOAuthFailHandler;
     private final RedisRefreshTokenService redisRefreshTokenService;
 
@@ -79,9 +81,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/signup", "/login", "/reissue", "/images/**").permitAll()
-//                        .requestMatchers("/**").permitAll()
-                        .requestMatchers("/admin").hasRole("ADMIN")
-                        .anyRequest().authenticated());
+                        .requestMatchers("/product/**", "/factory/**").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .anyRequest().authenticated())
+                .exceptionHandling((ex) -> ex.accessDeniedHandler(customAccessDeniedHandler));
 
         http
                 .addFilterBefore(new JwtFilter(jwtUtil), CustomLoginFilter.class);
