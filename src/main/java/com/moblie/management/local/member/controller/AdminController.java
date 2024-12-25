@@ -1,7 +1,6 @@
 package com.moblie.management.local.member.controller;
 
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
-import com.moblie.management.local.member.dto.AdminDto;
 import com.moblie.management.local.member.dto.MemberDto;
 import com.moblie.management.local.member.dto.Response;
 import com.moblie.management.local.member.service.AdminService;

@@ -46,7 +46,7 @@ public class MemberDto {
     @Getter @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Certification {
+    public static class MemberEmail {
         @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$",
                 message = EMAIL_ERROR)
         private String email;
