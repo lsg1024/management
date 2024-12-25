@@ -53,7 +53,7 @@ public class ProductController {
         return ResponseEntity.ok(new ProductResponse("저장 완료"));
     }
 
-    @PostMapping("/product/{productId}/edit")
+    @PatchMapping("/product/{productId}/edit")
     public ResponseEntity<ProductResponse> updateProduct(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable("productId") String productId,
