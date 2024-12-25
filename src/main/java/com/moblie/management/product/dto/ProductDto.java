@@ -91,6 +91,7 @@ public class ProductDto {
     }
 
     @Getter @Setter
+    @NoArgsConstructor
     public static class productSearchResult {
         private String modelName;
         private String factory;

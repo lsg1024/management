@@ -1,6 +1,7 @@
 package com.moblie.management.product.repository;
 
 import com.moblie.management.product.dto.ProductDto;
+import com.moblie.management.utils.PageCustom;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -42,7 +43,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
      * @return productSearchResult
      */
     @Override
-    public Page<ProductDto.productSearchResult> searchProduct(ProductDto.productCondition condition, Pageable pageable) {
+    public PageCustom<ProductDto.productSearchResult> searchProduct(ProductDto.productCondition condition, Pageable pageable) {
 
         BooleanBuilder whereClause = new BooleanBuilder();
         if (StringUtils.hasText(condition.getProductName())) {
@@ -79,6 +80,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
                 .leftJoin(productEntity.factory, factoryEntity)
                 .where(whereClause);
 
-        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+        // PageCustom 객체로 변환하여 반환
+        return new PageCustom<>(content, pageable, countQuery.fetchOne());
     }
+
 }
