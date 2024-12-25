@@ -49,19 +49,13 @@ spring:
   jpa:
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
   h2:
     console:
       enabled: true
-
-#  data:
-#    redis:
-
-#      host: 127.0.0.1
-#      port: 6379
 
   data:
     redis:
@@ -71,6 +65,11 @@ spring:
           - ${SERVER_URL}:${REDIS_MASTER_PORT_2},
           - ${SERVER_URL}:${REDIS_MASTER_PORT_3},
         max-redirects: 3
+  cache:
+    type: redis
+    redis:
+      enable-statistics: true
+
 
   mail:
     host: ${EMAIL_HOST}
