@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import static com.moblie.management.global.redis.validation.TokenValidation.*;
 import static com.moblie.management.local.member.util.MemberUtil.randomNumbers;
 
 @Service
@@ -86,7 +87,7 @@ public class MemberService {
 
     }
 
-    public void sendEmail(MemberDto.Certification newPasswordDto) {
+    public void sendEmail(MemberDto.MemberEmail memberEmail) {
 
         Random random = new Random();
 
@@ -94,11 +95,11 @@ public class MemberService {
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
-        mailMessage.setTo(newPasswordDto.getEmail());
+        mailMessage.setTo(memberEmail.getEmail());
         mailMessage.setSubject("비밀번호 변경을 위한 인증번호");
         mailMessage.setText("유효시간은 3분 입니다.\n" + certificationNumbers);
 
-        certificationNumberService.createToken(newPasswordDto.getEmail(), certificationNumbers);
+        certificationNumberService.createToken(memberEmail.getEmail(), certificationNumbers);
         javaMailSender.send(mailMessage);
 
     }

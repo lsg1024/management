@@ -54,11 +54,11 @@ public class MemberController {
 
     //인증번호 요청
     @PostMapping("/signin/find/password/email")
-    public ResponseEntity<Response> certificationRequest(@RequestBody @Valid MemberDto.Certification certification) {
+    public ResponseEntity<Response> certificationRequest(@RequestBody @Valid MemberDto.MemberEmail memberEmail) {
 
-        memberService.sendEmail(certification);
+        memberService.sendEmail(memberEmail);
 
-        return ResponseEntity.ok(new Response(certification.getEmail()));
+        return ResponseEntity.ok(new Response(memberEmail.getEmail()));
     }
 
     //인증번호 인증

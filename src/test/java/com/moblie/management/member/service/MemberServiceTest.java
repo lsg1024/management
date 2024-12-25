@@ -130,7 +130,7 @@ class MemberServiceTest {
     void sendEmailSuccess() {
         //given
         Random random = new Random();
-        MemberDto.Certification newMemberDto = new MemberDto.Certification();
+        MemberDto.MemberEmail newMemberDto = new MemberDto.MemberEmail();
         newMemberDto.setEmail("zksqazwsx@gmail.com");
 
         //when
@@ -148,7 +148,7 @@ class MemberServiceTest {
     @Order(2)
     void certificationSuccess() {
         //given
-        MemberDto.Certification newMemberDto = new MemberDto.Certification();
+        MemberDto.MemberEmail newMemberDto = new MemberDto.MemberEmail();
         newMemberDto.setEmail("zksqazwsx@gmail.com");
 
         Optional<CertificationNumberToken> token = certificationNumberService.getToken(newMemberDto.getEmail());

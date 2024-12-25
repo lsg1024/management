@@ -41,10 +41,16 @@ public class ProductValidation {
             products.add(productDto.toEntity(factory, member));
         }
     }
-    public static void validateExistsProductForMember(ProductRepository productRepository, PrincipalDetails principalDetails, String productId) {
-        if (!productRepository.existsByMemberIdAndProductId(principalDetails.getId(), productId)) {
-            throw new CustomException(ErrorCode.ERROR_404, "잘못된 데이터 정보가 들어왔습니다.");
+    public static void validateProductAccess(ProductRepository productRepository, PrincipalDetails principalDetails, String productId) {
+        if (principalDetails.getRole().equals("ADMIN")) {
+            return;
+        }
+
+        boolean productExists = productRepository.existsByMemberIdAndProductId(principalDetails.getId(), productId);
+        if (!productExists) {
+            throw new CustomException(ErrorCode.ERROR_403, "잘못된 데이터 정보가 들어왔습니다.");
         }
     }
+
 
 }

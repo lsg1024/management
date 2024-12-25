@@ -4,7 +4,8 @@ import com.moblie.management.local.member.domain.MemberEntity;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 
-import static com.moblie.management.member.domain.QMemberEntity.*;
+import static com.moblie.management.local.member.domain.QMemberEntity.memberEntity;
+
 
 public class MemberRepositoryImpl implements MemberRepositoryCustom{
 

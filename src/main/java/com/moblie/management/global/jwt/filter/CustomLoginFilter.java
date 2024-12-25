@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import static com.moblie.management.local.member.util.MemberUtil.createCookie;
+import static com.moblie.management.local.member.validation.MemberValidation.*;
 
 @Slf4j
 @RequiredArgsConstructor

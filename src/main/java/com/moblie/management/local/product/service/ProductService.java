@@ -62,7 +62,7 @@ public class ProductService {
     // 상품 정보 수정
     @Transactional
     public void updateProduct(PrincipalDetails principalDetails, String productId, ProductDto.productUpdate updateDto) {
-        ProductValidation.validateExistsProductForMember(productRepository, principalDetails, productId);
+        ProductValidation.validateProductAccess(productRepository, principalDetails, productId);
 
         ProductEntity product = productRepository.findById(Long.parseLong(productId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "업데이트에 실패하였습니다."));
@@ -82,7 +82,7 @@ public class ProductService {
     //상품 삭제
     @Transactional
     public void deletedProduct(PrincipalDetails principalDetails, String productId) {
-        ProductValidation.validateExistsProductForMember(productRepository, principalDetails, productId);
+        ProductValidation.validateProductAccess(productRepository, principalDetails, productId);
 
         ProductEntity product = productRepository.findById(Long.valueOf(productId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "유저 삭제를 실패하였습니다"));
