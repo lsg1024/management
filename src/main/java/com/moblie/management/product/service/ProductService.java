@@ -11,12 +11,12 @@ import com.moblie.management.product.domain.ProductEntity;
 import com.moblie.management.product.dto.ProductDto;
 import com.moblie.management.product.repository.ProductRepository;
 import com.moblie.management.product.validation.ProductValidation;
-import com.moblie.management.redis.service.RedisProductService;
+import com.moblie.management.utils.PageCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.data.domain.Page;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +38,6 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final FactoryRepository factoryRepository;
     private final MemberRepository memberRepository;
-    private final RedisProductService redisProductService;
 
     //상품 엑셀 파일 자동호출
     @Transactional
@@ -76,7 +75,8 @@ public class ProductService {
     }
 
     //상품 조회
-    public Page<ProductDto.productSearchResult> searchProduct(ProductDto.productCondition condition, Pageable pageable) {
+    @Cacheable(value = "productSearch", key = "#condition.productName + ':' + #condition.factory + ':' + #condition.modelClassification + ':' + #pageable.pageNumber", cacheManager = "redisCacheManager")
+    public PageCustom<ProductDto.productSearchResult> searchProducts(ProductDto.productCondition condition, Pageable pageable) {
         return productRepository.searchProduct(condition, pageable);
     }
 
