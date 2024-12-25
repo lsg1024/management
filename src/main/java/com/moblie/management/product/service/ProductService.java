@@ -87,7 +87,7 @@ public class ProductService {
 
         ProductEntity product = productRepository.findById(Long.valueOf(productId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "유저 삭제를 실패하였습니다"));
-        productRepository.delete(product);
+        product.delete();
     }
 
     /**
