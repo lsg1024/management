@@ -1,14 +1,15 @@
 package com.moblie.management.member.service;
 
-import com.moblie.management.exception.CustomException;
-import com.moblie.management.jwt.JwtUtil;
-import com.moblie.management.member.domain.MemberEntity;
-import com.moblie.management.member.dto.MemberDto;
-import com.moblie.management.member.repository.MemberRepository;
-import com.moblie.management.redis.domain.CertificationNumberToken;
-import com.moblie.management.redis.domain.RefreshToken;
-import com.moblie.management.redis.service.CertificationNumberService;
-import com.moblie.management.redis.service.RedisRefreshTokenService;
+import com.moblie.management.global.exception.CustomException;
+import com.moblie.management.global.jwt.JwtUtil;
+import com.moblie.management.local.member.domain.MemberEntity;
+import com.moblie.management.local.member.dto.MemberDto;
+import com.moblie.management.local.member.repository.MemberRepository;
+import com.moblie.management.global.redis.domain.CertificationNumberToken;
+import com.moblie.management.global.redis.domain.RefreshToken;
+import com.moblie.management.global.redis.service.CertificationNumberService;
+import com.moblie.management.global.redis.service.RedisRefreshTokenService;
+import com.moblie.management.local.member.service.MemberService;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
-import static com.moblie.management.member.util.MemberUtil.randomNumbers;
+import static com.moblie.management.local.member.util.MemberUtil.randomNumbers;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -129,7 +130,7 @@ class MemberServiceTest {
     void sendEmailSuccess() {
         //given
         Random random = new Random();
-        MemberDto.Certification newMemberDto = new MemberDto.Certification();
+        MemberDto.MemberEmail newMemberDto = new MemberDto.MemberEmail();
         newMemberDto.setEmail("zksqazwsx@gmail.com");
 
         //when
@@ -147,7 +148,7 @@ class MemberServiceTest {
     @Order(2)
     void certificationSuccess() {
         //given
-        MemberDto.Certification newMemberDto = new MemberDto.Certification();
+        MemberDto.MemberEmail newMemberDto = new MemberDto.MemberEmail();
         newMemberDto.setEmail("zksqazwsx@gmail.com");
 
         Optional<CertificationNumberToken> token = certificationNumberService.getToken(newMemberDto.getEmail());

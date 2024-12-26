@@ -1,6 +1,6 @@
 package com.moblie.management;
 
-import com.moblie.management.redis.RedisClusterProperties;
+import com.moblie.management.global.redis.RedisClusterProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

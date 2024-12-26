@@ -1,8 +1,9 @@
 package com.moblie.management.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moblie.management.member.dto.MemberDto;
-import com.moblie.management.member.service.MemberService;
+import com.moblie.management.local.member.controller.MemberController;
+import com.moblie.management.local.member.dto.MemberDto;
+import com.moblie.management.local.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

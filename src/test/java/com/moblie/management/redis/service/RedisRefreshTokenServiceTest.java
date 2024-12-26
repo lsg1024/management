@@ -1,8 +1,9 @@
 package com.moblie.management.redis.service;
 
-import com.moblie.management.jwt.JwtUtil;
-import com.moblie.management.redis.domain.RefreshToken;
-import com.moblie.management.redis.repository.RefreshRepository;
+import com.moblie.management.global.redis.service.RedisRefreshTokenService;
+import com.moblie.management.global.jwt.JwtUtil;
+import com.moblie.management.global.redis.domain.RefreshToken;
+import com.moblie.management.global.redis.repository.RefreshRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
