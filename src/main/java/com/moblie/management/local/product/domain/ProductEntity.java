@@ -1,5 +1,6 @@
 package com.moblie.management.local.product.domain;
 
+import com.moblie.management.global.utils.BaseEntity;
 import com.moblie.management.local.factory.domain.FactoryEntity;
 import com.moblie.management.local.member.domain.MemberEntity;
 import com.moblie.management.local.product.dto.ProductDto;
@@ -9,11 +10,14 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "product")
 @SQLDelete(sql = "UPDATE PRODUCT set DELETED = true where PRODUCT_ID = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductEntity {
+public class ProductEntity extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
@@ -38,6 +42,9 @@ public class ProductEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private MemberEntity member;
+
+    @OneToMany(mappedBy = "product")
+    private List<ProductImageEntity> productImageEntities = new ArrayList<>();
 
     @Builder
     public ProductEntity(String productName, FactoryEntity factory, MemberEntity member ,String productClassification, String productMaterial, String productColor, String productWeight, String productNote, String productBarcodeNumber) {

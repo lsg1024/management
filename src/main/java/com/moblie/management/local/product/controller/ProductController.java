@@ -1,5 +1,6 @@
 package com.moblie.management.local.product.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
 import com.moblie.management.local.product.dto.ProductDto;
 import com.moblie.management.local.product.dto.ProductResponse;
@@ -32,25 +33,19 @@ public class ProductController {
 
         List<String> errors = productService.createAutoProduct(principalDetails, file);
 
-        if (!errors.isEmpty()) {
-            return ResponseEntity.ok(new ProductResponse("중복 데이터가 존재합니다", errors));
-        }
-
-        return ResponseEntity.ok(new ProductResponse("저장완료"));
+        return errors.isEmpty() ? ResponseEntity.ok(new ProductResponse("저장 완료")) : ResponseEntity.ok(new ProductResponse("중복 데이터가 존재합니다", errors));
     }
 
-    @PostMapping("/product/new")
+    @PostMapping(value = "/product/new")
     public ResponseEntity<ProductResponse> createProduct(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestBody @Valid ProductDto.productsInfo productsInfo) {
+            @RequestParam(value = "images", required = false) List<MultipartFile> images,
+            @RequestParam("products") String products) throws IOException {
 
-        List<String> errors = productService.createManualProduct(principalDetails, productsInfo);
+        ProductDto.productsInfo productsDto = new ObjectMapper().readValue(products, ProductDto.productsInfo.class);
+        List<String> errors = productService.createManualProduct(principalDetails, images, productsDto);
 
-        if (!errors.isEmpty()) {
-            return ResponseEntity.ok(new ProductResponse("중복 데이터가 존재합니다", errors));
-        }
-
-        return ResponseEntity.ok(new ProductResponse("저장 완료"));
+        return errors.isEmpty() ? ResponseEntity.ok(new ProductResponse("저장 완료")) : ResponseEntity.ok(new ProductResponse("중복 데이터가 존재합니다", errors));
     }
 
     @PatchMapping("/product/{productId}/edit")
