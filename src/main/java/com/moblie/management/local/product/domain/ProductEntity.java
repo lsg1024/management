@@ -1,13 +1,13 @@
 package com.moblie.management.local.product.domain;
 
+import com.moblie.management.global.exception.CustomException;
+import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.global.utils.BaseEntity;
 import com.moblie.management.local.factory.domain.FactoryEntity;
 import com.moblie.management.local.member.domain.MemberEntity;
 import com.moblie.management.local.product.dto.ProductDto;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
 import java.util.ArrayList;
@@ -43,11 +43,14 @@ public class ProductEntity extends BaseEntity {
     @JoinColumn(name = "userId", nullable = false)
     private MemberEntity member;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(
+            mappedBy = "product",
+            orphanRemoval = true,
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private List<ProductImageEntity> productImageEntities = new ArrayList<>();
 
     @Builder
-    public ProductEntity(String productName, FactoryEntity factory, MemberEntity member ,String productClassification, String productMaterial, String productColor, String productWeight, String productNote, String productBarcodeNumber) {
+    private ProductEntity(String productName, FactoryEntity factory, MemberEntity member ,String productClassification, String productMaterial, String productColor, String productWeight, String productNote, String productBarcodeNumber) {
         this.productName = productName;
         this.factory = factory;
         this.member = member;
@@ -59,7 +62,25 @@ public class ProductEntity extends BaseEntity {
         this.productBarcodeNumber = productBarcodeNumber;
     }
 
+
+    public static ProductEntity create(ProductDto.createProduct productDto, MemberEntity member, FactoryEntity factory) {
+        return ProductEntity.builder()
+                .productName(productDto.getProductName())
+                .factory(factory)
+                .member(member)
+                .productClassification(productDto.getModelClassification())
+                .productMaterial(productDto.getGoldType())
+                .productColor(productDto.getGoldColor())
+                .productWeight(productDto.getModelWeight())
+                .productNote(productDto.getModelNote())
+                .productBarcodeNumber(productDto.getModelBarcode())
+                .build();
+    }
+
     public void productUpdate(ProductDto.productUpdate productUpdate, FactoryEntity factory) {
+        if (factory == null) {
+            throw new CustomException(ErrorCode.ERROR_400, "유효하지 않은 공장 정보");
+        }
         this.productName = productUpdate.getProductName();
         this.factory = factory;
         this.productClassification = productUpdate.getModelClassification();
@@ -67,6 +88,25 @@ public class ProductEntity extends BaseEntity {
         this.productColor = productUpdate.getGoldColor();
         this.productWeight = productUpdate.getModelWeight();
         this.productNote = productUpdate.getModelNote();
+    }
+
+    public void addImage(ProductImageEntity image) {
+        productImageEntities.add(image);
+        image.setProduct(this);
+    }
+
+    public void validateProductAccess(String productId) {
+        if (this.productId != Long.parseLong(productId)) {
+            throw new CustomException(ErrorCode.ERROR_404, "잘못된 데이터 정보가 들어왔습니다.");
+        }
+    }
+
+    public String generateImageFolderName() {
+        return this.productName.replace(" ", "_");
+    }
+
+    public Long getProductId() {
+        return productId;
     }
 
     public void delete() {
