@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,16 @@ public class MemberService {
     private final CertificationNumberService certificationNumberService;
     private final RedisRefreshTokenService redisRefreshTokenService;
 
+    public boolean isAccess(String email) {
+        String sessionEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        String sessionRole = SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority();
+
+        if (sessionRole.equals("ROLE_ADMIN")) {
+            return true;
+        }
+
+        return sessionEmail.equals(email);
+    }
     @Transactional
     public void signUp(MemberDto.SignUp signUp) {
 
