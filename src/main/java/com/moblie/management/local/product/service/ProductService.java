@@ -2,12 +2,12 @@ package com.moblie.management.local.product.service;
 
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
-import com.moblie.management.local.factory.domain.FactoryEntity;
+import com.moblie.management.local.factory.modal.FactoryEntity;
 import com.moblie.management.local.factory.repository.FactoryRepository;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
-import com.moblie.management.local.product.domain.ProductEntity;
+import com.moblie.management.local.product.modal.ProductEntity;
 import com.moblie.management.local.product.repository.ProductRepository;
-import com.moblie.management.local.member.domain.MemberEntity;
+import com.moblie.management.local.member.modal.MemberEntity;
 import com.moblie.management.local.member.repository.MemberRepository;
 import com.moblie.management.local.product.dto.ProductDto;
 import com.moblie.management.global.utils.PageCustom;

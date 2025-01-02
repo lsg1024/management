@@ -1,4 +1,4 @@
-package com.moblie.management.local.factory.domain;
+package com.moblie.management.local.factory.modal;
 
 import com.moblie.management.global.utils.BaseEntity;
 import com.moblie.management.local.factory.dto.FactoryDto;
