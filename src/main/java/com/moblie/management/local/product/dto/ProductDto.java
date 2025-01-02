@@ -40,20 +40,6 @@ public class ProductDto {
             this.modelWeight = modelWeight;
             this.modelNote = modelNote;
         }
-
-        public ProductEntity toEntity(FactoryEntity factory, MemberEntity member) {
-            return ProductEntity.builder()
-                    .productName(productName)
-                    .productBarcodeNumber(modelBarcode)
-                    .productClassification(modelClassification)
-                    .productMaterial(goldType)
-                    .productColor(goldColor)
-                    .productWeight(modelWeight)
-                    .productNote(modelNote)
-                    .factory(factory)
-                    .member(member)
-                    .build();
-        }
     }
 
     public static class productsInfo {
