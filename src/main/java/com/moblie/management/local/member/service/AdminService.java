@@ -24,11 +24,7 @@ public class AdminService {
     }
 
     @Transactional
-    public void deleteMember(PrincipalDetails principalDetails, MemberDto.MemberEmail updateMemberInfo) {
-        if (!principalDetails.getRole().equals("ROLE")) {
-            throw new CustomException(ErrorCode.ERROR_409, "권한이 없는 사용자 입니다.");
-        }
-
+    public void deleteMember(MemberDto.MemberEmail updateMemberInfo) {
         MemberEntity member = memberRepository.findByEmail(updateMemberInfo.getEmail());
         member.softDelete();
     }
