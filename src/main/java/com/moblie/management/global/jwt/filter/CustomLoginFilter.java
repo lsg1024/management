@@ -32,8 +32,8 @@ import static com.moblie.management.local.member.validation.MemberValidation.*;
 @RequiredArgsConstructor
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final static Long ACCESS_TTL = 900L;
-    private final static Long REFRESH_TTL = 259200L;
+    private final static Long ACCESS_TTL = 3 * 24 * 60 * 60L;
+    private final static Long REFRESH_TTL = 14 * 24 * 60 * 60L;
 
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
