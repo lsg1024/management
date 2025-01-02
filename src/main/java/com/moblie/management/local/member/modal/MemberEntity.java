@@ -1,4 +1,4 @@
-package com.moblie.management.local.member.domain;
+package com.moblie.management.local.member.modal;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

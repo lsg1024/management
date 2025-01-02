@@ -1,8 +1,5 @@
 package com.moblie.management.local.product.dto;
 
-import com.moblie.management.local.factory.domain.FactoryEntity;
-import com.moblie.management.local.product.domain.ProductEntity;
-import com.moblie.management.local.member.domain.MemberEntity;
 import com.querydsl.core.annotations.QueryProjection;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

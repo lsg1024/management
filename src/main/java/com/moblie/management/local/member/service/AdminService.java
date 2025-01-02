@@ -1,9 +1,6 @@
 package com.moblie.management.local.member.service;
 
-import com.moblie.management.global.exception.CustomException;
-import com.moblie.management.global.exception.ErrorCode;
-import com.moblie.management.global.jwt.dto.PrincipalDetails;
-import com.moblie.management.local.member.domain.MemberEntity;
+import com.moblie.management.local.member.modal.MemberEntity;
 import com.moblie.management.local.member.dto.MemberDto;
 import com.moblie.management.local.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;

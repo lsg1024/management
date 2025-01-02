@@ -1,6 +1,6 @@
 package com.moblie.management.local.member.repository;
 
-import com.moblie.management.local.member.domain.MemberEntity;
+import com.moblie.management.local.member.modal.MemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberRepository extends JpaRepository<MemberEntity, Long>, MemberRepositoryCustom {

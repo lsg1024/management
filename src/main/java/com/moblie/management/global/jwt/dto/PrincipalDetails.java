@@ -1,5 +1,5 @@
 package com.moblie.management.global.jwt.dto;
-import com.moblie.management.local.member.domain.MemberEntity;
+import com.moblie.management.local.member.modal.MemberEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;

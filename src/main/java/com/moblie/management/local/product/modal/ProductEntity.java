@@ -1,10 +1,10 @@
-package com.moblie.management.local.product.domain;
+package com.moblie.management.local.product.modal;
 
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.global.utils.BaseEntity;
-import com.moblie.management.local.factory.domain.FactoryEntity;
-import com.moblie.management.local.member.domain.MemberEntity;
+import com.moblie.management.local.factory.modal.FactoryEntity;
+import com.moblie.management.local.member.modal.MemberEntity;
 import com.moblie.management.local.product.dto.ProductDto;
 import jakarta.persistence.*;
 import lombok.*;
