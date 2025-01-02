@@ -2,7 +2,6 @@ package com.moblie.management.local.product.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -21,20 +20,23 @@ public class ProductImageEntity {
     @JoinColumn(name = "productId")
     private ProductEntity product;
 
-    @Builder
-    public ProductImageEntity(String imageName, String imageOriginName, String imagePath, String firstImagePath) {
+    private ProductImageEntity(String imageName, String imageOriginName, String imagePath, String firstImagePath) {
         this.imageName = imageName;
         this.imageOriginName = imageOriginName;
         this.imagePath = imagePath;
         this.firstImagePath = firstImagePath;
     }
 
-    public void addProductImages(ProductImageEntity productImage, ProductEntity product) {
-        if (this.imageOriginName.equals(productImage.imageOriginName)) {
-            this.imageName = productImage.imageName;
-        } else {
-            this.product = product;
-        }
+    public static ProductImageEntity create(String newFileName, String imageOriginalName, String path, String firstImagePath) {
+        return new ProductImageEntity(
+                newFileName,
+                imageOriginalName,
+                path + "/" + newFileName,
+                firstImagePath);
+    }
+
+    public void setProduct(ProductEntity product) {
+        this.product = product;
     }
 
 }
