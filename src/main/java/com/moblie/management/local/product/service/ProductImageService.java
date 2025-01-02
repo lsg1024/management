@@ -2,8 +2,8 @@ package com.moblie.management.local.product.service;
 
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
-import com.moblie.management.local.product.modal.ProductEntity;
-import com.moblie.management.local.product.modal.ProductImageEntity;
+import com.moblie.management.local.product.model.ProductEntity;
+import com.moblie.management.local.product.model.ProductImageEntity;
 import com.moblie.management.local.product.dto.ProductDto;
 import com.moblie.management.local.product.repository.ProductImageRepository;
 import com.moblie.management.local.product.repository.ProductRepository;

@@ -1,4 +1,4 @@
-package com.moblie.management.local.member.modal;
+package com.moblie.management.local.member.model;
 
 import lombok.RequiredArgsConstructor;
 

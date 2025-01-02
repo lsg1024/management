@@ -12,8 +12,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-import static com.moblie.management.local.factory.modal.QFactoryEntity.factoryEntity;
-import static com.moblie.management.local.product.modal.QProductEntity.productEntity;
+import static com.moblie.management.local.factory.model.QFactoryEntity.factoryEntity;
+import static com.moblie.management.local.product.model.QProductEntity.productEntity;
 
 
 public class ProductRepositoryImpl implements ProductRepositoryCustom{

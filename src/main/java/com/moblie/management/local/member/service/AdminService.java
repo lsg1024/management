@@ -1,6 +1,6 @@
 package com.moblie.management.local.member.service;
 
-import com.moblie.management.local.member.modal.MemberEntity;
+import com.moblie.management.local.member.model.MemberEntity;
 import com.moblie.management.local.member.dto.MemberDto;
 import com.moblie.management.local.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;

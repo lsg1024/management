@@ -2,7 +2,7 @@ package com.moblie.management.member.service;
 
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.jwt.JwtUtil;
-import com.moblie.management.local.member.modal.MemberEntity;
+import com.moblie.management.local.member.model.MemberEntity;
 import com.moblie.management.local.member.dto.MemberDto;
 import com.moblie.management.local.member.repository.MemberRepository;
 import com.moblie.management.global.redis.domain.CertificationNumberToken;

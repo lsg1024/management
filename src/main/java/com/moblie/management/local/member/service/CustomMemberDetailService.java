@@ -1,7 +1,7 @@
 package com.moblie.management.local.member.service;
 
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
-import com.moblie.management.local.member.modal.MemberEntity;
+import com.moblie.management.local.member.model.MemberEntity;
 import com.moblie.management.local.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

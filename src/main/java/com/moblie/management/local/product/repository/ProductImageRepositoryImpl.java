@@ -3,8 +3,8 @@ package com.moblie.management.local.product.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 
-import static com.moblie.management.local.product.modal.QProductEntity.productEntity;
-import static com.moblie.management.local.product.modal.QProductImageEntity.productImageEntity;
+import static com.moblie.management.local.product.model.QProductEntity.productEntity;
+import static com.moblie.management.local.product.model.QProductImageEntity.productImageEntity;
 
 public class ProductImageRepositoryImpl implements ProductImageRepositoryCustom{
     private final JPAQueryFactory query;

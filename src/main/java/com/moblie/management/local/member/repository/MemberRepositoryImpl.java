@@ -1,10 +1,10 @@
 package com.moblie.management.local.member.repository;
 
-import com.moblie.management.local.member.modal.MemberEntity;
+import com.moblie.management.local.member.model.MemberEntity;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 
-import static com.moblie.management.local.member.modal.QMemberEntity.memberEntity;
+import static com.moblie.management.local.member.model.QMemberEntity.memberEntity;
 
 
 public class MemberRepositoryImpl implements MemberRepositoryCustom{

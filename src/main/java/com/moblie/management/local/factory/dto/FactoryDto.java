@@ -1,6 +1,6 @@
 package com.moblie.management.local.factory.dto;
 
-import com.moblie.management.local.factory.modal.FactoryEntity;
+import com.moblie.management.local.factory.model.FactoryEntity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

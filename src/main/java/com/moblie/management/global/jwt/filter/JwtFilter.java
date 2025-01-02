@@ -2,8 +2,8 @@ package com.moblie.management.global.jwt.filter;
 
 import com.moblie.management.global.jwt.JwtUtil;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
-import com.moblie.management.local.member.modal.MemberEntity;
-import com.moblie.management.local.member.modal.Role;
+import com.moblie.management.local.member.model.MemberEntity;
+import com.moblie.management.local.member.model.Role;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

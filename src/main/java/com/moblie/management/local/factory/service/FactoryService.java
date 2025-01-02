@@ -2,7 +2,7 @@ package com.moblie.management.local.factory.service;
 
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
-import com.moblie.management.local.factory.modal.FactoryEntity;
+import com.moblie.management.local.factory.model.FactoryEntity;
 import com.moblie.management.local.factory.dto.FactoryDto;
 import com.moblie.management.local.factory.repository.FactoryRepository;
 import com.moblie.management.local.factory.excel.ExcelFactory;
