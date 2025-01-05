@@ -18,7 +18,7 @@ public class ProductValidation {
     }
     public static void validateProductDto(ProductRepository productRepository, FactoryRepository factoryRepository, ProductDto.createProduct productDto, Set<String> errors) {
         validateExistProductName(productRepository, productDto.getProductName(), errors);
-        validateExistBarcode(productRepository, productDto.getProductName(), productDto.getModelBarcode(), errors);
+//        validateExistBarcode(productRepository, productDto.getProductName(), productDto.getModelBarcode(), errors);
         validateExistFactory(factoryRepository, productDto.getFactory(), errors);
     }
     public static void validateExistProductName(ProductRepository productRepository, String modelName, Set<String> errors) {
@@ -29,7 +29,7 @@ public class ProductValidation {
 
     public static void validateExistBarcode(ProductRepository productRepository, String modelName, String barcode, Set<String> errors) {
         if (productRepository.existsByProductBarcodeNumber(barcode)) {
-            errors.add("중복된 모델 이름: " + modelName);
+            errors.add("중복된 바코드 명: " + modelName);
         }
     }
 

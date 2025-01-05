@@ -109,16 +109,25 @@ public class ProductService {
         MemberEntity member = memberRepository.findById(Long.valueOf(memberId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_409, "유저 정보 오류"));
 
+        List<ProductEntity> productEntities = new ArrayList<>();
         for (ProductDto.createProduct productDto : productsInfo.products) {
-            validateProductDto(productRepository, factoryRepository, productDto, errorSet);
+
+            Set<String> error = new HashSet<>();
+            validateProductDto(productRepository, factoryRepository, productDto, error);
 
             FactoryEntity factory = factoryRepository.findByFactoryName(productDto.getFactory());
 
-            if (errorSet.isEmpty()) {
-                ProductEntity product = ProductEntity.create(productDto, member, factory);
-                productRepository.save(product);
+            if (error.isEmpty()) {
+                ProductEntity productEntity = ProductEntity.create(productDto, member, factory);
+                productEntities.add(productEntity);
+            } else {
+                errorSet.addAll(error);
             }
         }
+        if (!productEntities.isEmpty()) {
+            productRepository.saveAll(productEntities);
+        }
+
         errorProduct.addAll(errorSet);
     }
 
