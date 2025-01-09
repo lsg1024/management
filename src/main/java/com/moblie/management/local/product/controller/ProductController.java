@@ -124,7 +124,7 @@ public class ProductController {
     }
 
     private void isAccess(String email) {
-        if (!memberService.isAccess(email)) {
+        if (memberService.isAccess(email)) {
             throw new CustomException(ErrorCode.ERROR_409, "권한이 없는 사용자 입니다.");
         }
     }

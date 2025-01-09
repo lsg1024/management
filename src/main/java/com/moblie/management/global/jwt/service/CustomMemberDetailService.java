@@ -1,4 +1,4 @@
-package com.moblie.management.local.member.service;
+package com.moblie.management.global.jwt.service;
 
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
 import com.moblie.management.local.member.model.MemberEntity;
@@ -19,24 +19,20 @@ public class CustomMemberDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        MemberEntity members = membersRepository.findByEmail(email);
+        MemberEntity member = membersRepository.findByEmail(email);
 
-        log.info("loadUserByUsername");
-
-        if (members == null) {
+        if (member == null) {
             log.info("사용자를 찾을 수 없습니다.");
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email);
         }
 
-        log.info("members.getRole(): {}", members.getRole());
+        if ("WAIT".equals(String.valueOf(member.getRole()))) {
+            log.info("미승인 사용자입니다: {}", email);
+            throw new UsernameNotFoundException("미승인 사용자입니다: " + email);
+        }
 
-//        if ("WAIT".equals(String.valueOf(members.getRole()))) {
-//            log.info("미승인 사용자입니다: {}", email);
-//            throw new UsernameNotFoundException("미승인 사용자입니다: " + email);
-//        }
-
-        log.info("사용자 인증 성공: {}, {}", email, members.getPassword());
-        return new PrincipalDetails(members);
+        log.info("사용자 인증 성공: {}, {}", email, member.getPassword());
+        return new PrincipalDetails(member);
     }
 
 }
