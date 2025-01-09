@@ -2,6 +2,8 @@ package com.moblie.management.local.factory.service;
 
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
+import com.moblie.management.global.redis.rock.DefaultRock;
+import com.moblie.management.global.utils.PageCustom;
 import com.moblie.management.local.factory.model.FactoryEntity;
 import com.moblie.management.local.factory.dto.FactoryDto;
 import com.moblie.management.local.factory.repository.FactoryRepository;
@@ -9,6 +11,8 @@ import com.moblie.management.local.factory.excel.ExcelFactory;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,8 +65,13 @@ public class FactoryService {
         return errors;
     }
 
+    @Cacheable(value = "factorySearch", key = "#condition.factoryName", cacheManager = "redisCacheManager")
+    public PageCustom<FactoryDto.factoriesResponse> searchFactories(FactoryDto.factoryCondition condition, Pageable pageable) {
+        return factoryRepository.searchFactories(condition, pageable);
+    }
+
     //수정
-    @Transactional
+    @DefaultRock(key = "#factoryId")
     public void updateFactory(String factoryId, FactoryDto.factoryUpdate updateDto) {
         FactoryEntity factory = factoryRepository.findById(Long.parseLong(factoryId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "업데이트에 실패하였스빈다."));
@@ -80,7 +89,7 @@ public class FactoryService {
     private void extractedFactoryInfo(FactoryDto.factoryInfo factoryInfo, List<FactoryEntity> factories, List<String> ErrorProduct) {
         for (FactoryDto.createFactory factory : factoryInfo.factories) {
             if (validateUnionProductName(factory, ErrorProduct)) {
-                factories.add(factory.toEntity());
+                factories.add(FactoryEntity.create(factory.getFactoryName()));
             }
         }
     }

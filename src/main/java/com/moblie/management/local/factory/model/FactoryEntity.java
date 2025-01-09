@@ -22,12 +22,23 @@ public class FactoryEntity extends BaseEntity {
 
     private boolean deleted = false;
 
-    @Builder
-    public FactoryEntity(String factoryName) {
+    @Builder(access = AccessLevel.PRIVATE)
+    protected FactoryEntity(String factoryName) {
         this.factoryName = factoryName;
+    }
+
+    public static FactoryEntity create(String factoryName) {
+        return FactoryEntity.builder()
+                .factoryName(factoryName)
+                .build();
     }
 
     public void factoryUpdate(FactoryDto.factoryUpdate updateDto) {
         this.factoryName = updateDto.getFactoryName();
     }
+
+    public void delete() {
+        this.deleted = true;
+    }
+
 }
