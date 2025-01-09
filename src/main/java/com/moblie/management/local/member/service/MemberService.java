@@ -3,6 +3,7 @@ package com.moblie.management.local.member.service;
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.global.jwt.JwtUtil;
+import com.moblie.management.global.jwt.dto.PrincipalDetails;
 import com.moblie.management.local.member.validation.MemberValidation;
 import com.moblie.management.local.member.model.MemberEntity;
 import com.moblie.management.local.member.model.Role;
@@ -45,14 +46,21 @@ public class MemberService {
     private final RedisRefreshTokenService redisRefreshTokenService;
 
     public boolean isAccess(String email) {
-        String sessionEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        PrincipalDetails principalDetails = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String sessionEmail = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         String sessionRole = SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority();
+
+        log.info("isAccess {} {}", principalDetails.getName(), sessionRole);
 
         if (sessionRole.equals("ROLE_ADMIN")) {
             return true;
         }
 
-        return sessionEmail.equals(email);
+        if (sessionEmail.equals(email)) {
+            return true;
+        }
+
+        return false;
     }
     @Transactional
     public void signUp(MemberDto.SignUp signUp) {
