@@ -15,19 +15,13 @@ public class FactoryDto {
 
     public static class factoryInfo {
         @Valid @NotNull
-        public List<createFactory> factories;
+        public List<factory> factories;
     }
 
     @Getter @Setter
-    @AllArgsConstructor
-    public static class createFactory {
-        @NotEmpty(message = "공장 이름을 입력해주세요.")
-        private String factoryName;
-    }
-
-    @Getter
     @NoArgsConstructor
-    public static class factoryUpdate {
+    @AllArgsConstructor
+    public static class factory {
         @NotEmpty(message = "공장 이름을 입력해주세요.")
         private String factoryName;
     }

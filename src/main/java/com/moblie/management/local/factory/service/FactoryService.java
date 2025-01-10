@@ -8,7 +8,7 @@ import com.moblie.management.local.factory.model.FactoryEntity;
 import com.moblie.management.local.factory.dto.FactoryDto;
 import com.moblie.management.local.factory.repository.FactoryRepository;
 import com.moblie.management.local.factory.excel.ExcelFactory;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,12 +23,16 @@ import java.util.List;
 
 import static com.moblie.management.global.utils.ExcelSheetUtil.getSheets;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class FactoryService {
 
     private final FactoryRepository factoryRepository;
+
+    public FactoryService(FactoryRepository factoryRepository) {
+        this.factoryRepository = factoryRepository;
+    }
 
     //자동생성
     @Transactional
@@ -53,7 +57,7 @@ public class FactoryService {
 
     //수동생성
     @Transactional
-    public List<String> createManualProduct(FactoryDto.factoryInfo factoryInfo) {
+    public List<String> createManualFactory(FactoryDto.factoryInfo factoryInfo) {
 
         List<FactoryEntity> factories = new ArrayList<>();
         List<String> errors = new ArrayList<>();
@@ -72,30 +76,40 @@ public class FactoryService {
 
     //수정
     @DefaultRock(key = "#factoryId")
-    public void updateFactory(String factoryId, FactoryDto.factoryUpdate updateDto) {
+    public List<String> updateFactory(String factoryId, FactoryDto.factory updateDto) {
         FactoryEntity factory = factoryRepository.findById(Long.parseLong(factoryId))
-                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "업데이트에 실패하였스빈다."));
-        factory.factoryUpdate(updateDto);
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "상품 수정 실패"));
+
+        List<String> errors = new ArrayList<>();
+
+        log.info("existsByFactoryName {}", factoryRepository.existsByFactoryName(updateDto.getFactoryName()));
+        if (factoryRepository.existsByFactoryName(updateDto.getFactoryName())) {
+            errors.add(updateDto.getFactoryName());
+        } else {
+            factory.factoryUpdate(updateDto);
+        }
+
+        return errors;
     }
 
     //삭제
     @Transactional
     public void deleteFactory(String factoryId) {
         FactoryEntity factory = factoryRepository.findById(Long.parseLong(factoryId))
-                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "상품 삭제에 실패했습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "상품 삭제 실패"));
         factoryRepository.delete(factory);
     }
 
-    private void extractedFactoryInfo(FactoryDto.factoryInfo factoryInfo, List<FactoryEntity> factories, List<String> ErrorProduct) {
-        for (FactoryDto.createFactory factory : factoryInfo.factories) {
-            if (validateUnionProductName(factory, ErrorProduct)) {
+    private void extractedFactoryInfo(FactoryDto.factoryInfo factoryInfo, List<FactoryEntity> factories, List<String> ErrorFactories) {
+        for (FactoryDto.factory factory : factoryInfo.factories) {
+            if (validateUnionFactoryName(factory, ErrorFactories)) {
                 factories.add(FactoryEntity.create(factory.getFactoryName()));
             }
         }
     }
 
     //예외를 발생시 해당 데이터들을 모아서 반환
-    private boolean validateUnionProductName(FactoryDto.createFactory factory, List<String> errors) {
+    private boolean validateUnionFactoryName(FactoryDto.factory factory, List<String> errors) {
         if (factoryRepository.existsByFactoryName(factory.getFactoryName())) {
             errors.add(factory.getFactoryName());
             return false;

@@ -1,5 +1,7 @@
 package com.moblie.management.local.factory.model;
 
+import com.moblie.management.global.exception.CustomException;
+import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.global.utils.BaseEntity;
 import com.moblie.management.local.factory.dto.FactoryDto;
 import jakarta.persistence.*;
@@ -33,8 +35,13 @@ public class FactoryEntity extends BaseEntity {
                 .build();
     }
 
-    public void factoryUpdate(FactoryDto.factoryUpdate updateDto) {
+    public void factoryUpdate(FactoryDto.factory updateDto) {
         this.factoryName = updateDto.getFactoryName();
+    }
+
+    //테스트 전용
+    public String getFactoryName() {
+        return factoryName;
     }
 
     public void delete() {

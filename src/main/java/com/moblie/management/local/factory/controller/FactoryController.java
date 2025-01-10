@@ -41,7 +41,7 @@ public class FactoryController {
     public ResponseEntity<Response> createManualProduct(
             @RequestBody FactoryDto.factoryInfo factories) {
 
-        List<String> errors = factoryService.createManualProduct(factories);
+        List<String> errors = factoryService.createManualFactory(factories);
 
         return getResponse(errors);
     }
@@ -60,10 +60,14 @@ public class FactoryController {
     public ResponseEntity<Response> updateFactory(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable(name = "factory_id") String factoryId,
-            @RequestBody FactoryDto.factoryUpdate updateFactory) {
+            @RequestBody FactoryDto.factory updateFactory) {
 
         isAccess(principalDetails.getEmail());
-        factoryService.updateFactory(factoryId, updateFactory);
+        List<String> error = factoryService.updateFactory(factoryId, updateFactory);
+
+        if (!error.isEmpty()) {
+            return ResponseEntity.status(404).body(new Response("수정 실패", error));
+        }
 
         return ResponseEntity.ok(new Response("수정 완료"));
     }
