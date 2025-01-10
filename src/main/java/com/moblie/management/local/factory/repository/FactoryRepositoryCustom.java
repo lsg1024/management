@@ -7,4 +7,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface FactoryRepositoryCustom {
     PageCustom<FactoryDto.factoriesResponse> searchFactories(FactoryDto.factoryCondition factoryCondition, Pageable pageable);
+    FactoryDto.find_factory findByFactoryId(String factoryId);
 }

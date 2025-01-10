@@ -8,9 +8,12 @@ import com.moblie.management.local.factory.model.FactoryEntity;
 import com.moblie.management.local.factory.dto.FactoryDto;
 import com.moblie.management.local.factory.repository.FactoryRepository;
 import com.moblie.management.local.factory.excel.ExcelFactory;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,9 +32,11 @@ import static com.moblie.management.global.utils.ExcelSheetUtil.getSheets;
 public class FactoryService {
 
     private final FactoryRepository factoryRepository;
+    private final CacheManager cacheManager;
 
-    public FactoryService(FactoryRepository factoryRepository) {
+    public FactoryService(FactoryRepository factoryRepository, CacheManager cacheManager) {
         this.factoryRepository = factoryRepository;
+        this.cacheManager = cacheManager;
     }
 
     //자동생성
@@ -69,20 +74,25 @@ public class FactoryService {
         return errors;
     }
 
+    //페이지 조회
     @Cacheable(value = "factorySearch", key = "#condition.factoryName", cacheManager = "redisCacheManager")
     public PageCustom<FactoryDto.factoriesResponse> searchFactories(FactoryDto.factoryCondition condition, Pageable pageable) {
         return factoryRepository.searchFactories(condition, pageable);
+    }
+
+    //상세 조회
+    public FactoryDto.find_factory detailFactory(String factoryId) {
+        return factoryRepository.findByFactoryId(factoryId);
     }
 
     //수정
     @DefaultRock(key = "#factoryId")
     public List<String> updateFactory(String factoryId, FactoryDto.factory updateDto) {
         FactoryEntity factory = factoryRepository.findById(Long.parseLong(factoryId))
-                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "상품 수정 실패"));
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404));
 
         List<String> errors = new ArrayList<>();
 
-        log.info("existsByFactoryName {}", factoryRepository.existsByFactoryName(updateDto.getFactoryName()));
         if (factoryRepository.existsByFactoryName(updateDto.getFactoryName())) {
             errors.add(updateDto.getFactoryName());
         } else {
@@ -93,7 +103,7 @@ public class FactoryService {
     }
 
     //삭제
-    @Transactional
+    @DefaultRock(key = "#factoryId")
     public void deleteFactory(String factoryId) {
         FactoryEntity factory = factoryRepository.findById(Long.parseLong(factoryId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "상품 삭제 실패"));

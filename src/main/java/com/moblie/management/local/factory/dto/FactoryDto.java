@@ -26,6 +26,19 @@ public class FactoryDto {
         private String factoryName;
     }
 
+    @Getter @Setter
+    @NoArgsConstructor
+    public static class find_factory {
+        private Long factoryId;
+        private String factoryName;
+
+        @QueryProjection
+        public find_factory(Long factoryId, String factoryName) {
+            this.factoryId = factoryId;
+            this.factoryName = factoryName;
+        }
+    }
+
     @Getter
     @NoArgsConstructor
     public static class factoryCondition {

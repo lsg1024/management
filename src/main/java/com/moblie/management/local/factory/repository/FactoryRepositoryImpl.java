@@ -3,6 +3,7 @@ package com.moblie.management.local.factory.repository;
 import com.moblie.management.global.utils.PageCustom;
 import com.moblie.management.local.factory.dto.FactoryDto;
 import com.moblie.management.local.factory.dto.QFactoryDto_factoriesResponse;
+import com.moblie.management.local.factory.dto.QFactoryDto_find_factory;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -52,5 +53,17 @@ public class FactoryRepositoryImpl implements FactoryRepositoryCustom{
                                 .and(factoryEntity.deleted.eq(false)));
 
         return new PageCustom<>(content, pageable, countQuery.fetchOne());
+    }
+
+    @Override
+    public FactoryDto.find_factory findByFactoryId(String factoryId) {
+        return query
+                .select(new QFactoryDto_find_factory(
+                        factoryEntity.factoryId,
+                        factoryEntity.factoryName
+                ))
+                .from(factoryEntity)
+                .where(factoryEntity.factoryId.eq(Long.valueOf(factoryId)))
+                .fetchOne();
     }
 }

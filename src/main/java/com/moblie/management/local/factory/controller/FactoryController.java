@@ -56,6 +56,15 @@ public class FactoryController {
         return factoryService.searchFactories(condition, pageable);
     }
 
+    @GetMapping("/factory/{factory_id}")
+    public ResponseEntity<FactoryDto.find_factory> detailFactory(
+            @PathVariable(name = "factory_id") String factoryId) {
+
+        FactoryDto.find_factory factory = factoryService.detailFactory(factoryId);
+
+        return ResponseEntity.ok(factory);
+    }
+
     @PatchMapping("/factory/{factory_id}")
     public ResponseEntity<Response> updateFactory(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
