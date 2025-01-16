@@ -9,11 +9,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "factory")
-@SQLDelete(sql = "UPDATE FACTORY set DELETED = true where FACTORY_ID = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE FACTORY set DELETED = true where FACTORY_ID = ?")
+@SQLRestriction("deleted = false")
 public class FactoryEntity extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
