@@ -16,6 +16,8 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
@@ -47,9 +49,15 @@ public class RedissonConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
                 .entryTtl(Duration.ofMinutes(3L)); // 캐시 수명 설정
 
+        Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
+        cacheConfigurations.put("sLC", redisCacheConfiguration.entryTtl(Duration.ofMinutes(3L))); // 3분
+        cacheConfigurations.put("lLC", redisCacheConfiguration.entryTtl(Duration.ofMinutes(10L))); // 10분
+        cacheConfigurations.put("vLLC", redisCacheConfiguration.entryTtl(Duration.ofDays(3L))); // 3일
+
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(cf)
                 .cacheDefaults(redisCacheConfiguration)
+                .withInitialCacheConfigurations(cacheConfigurations)
                 .build();
     }
 

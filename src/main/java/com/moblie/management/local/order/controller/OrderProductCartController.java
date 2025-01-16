@@ -6,7 +6,6 @@ import com.moblie.management.global.jwt.dto.PrincipalDetails;
 import com.moblie.management.local.member.service.MemberService;
 import com.moblie.management.local.order.dto.OrderDto;
 import com.moblie.management.local.order.service.OrderProductCartService;
-import com.moblie.management.local.order.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +22,7 @@ public class OrderProductCartController {
 
     private final MemberService memberService;
     private final OrderProductCartService orderProductCartService;
-    private final OrderService orderService;
+
     @PostMapping("/cart")
     public ResponseEntity<?> newCart(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
