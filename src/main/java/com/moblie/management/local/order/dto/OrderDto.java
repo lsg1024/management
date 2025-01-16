@@ -13,8 +13,12 @@ public class OrderDto {
 
     @Getter
     public static class productsDto {
-        @NotEmpty(message = "주문장을 작성해주세요.")
-        private List<createDto> productsDto;
+        private List<order> productsDto;
+
+        static class order {
+            private String cart_id;
+            private String order_id;
+        }
     }
 
     @Getter
