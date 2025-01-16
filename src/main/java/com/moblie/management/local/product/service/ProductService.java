@@ -73,7 +73,7 @@ public class ProductService {
     }
 
     //상품 조회
-    @Cacheable(value = "productSearch", key = "#condition.productName + ':' + #condition.factory + ':' + #condition.modelClassification + ':' + #pageable.pageNumber", cacheManager = "redisCacheManager")
+    @Cacheable(value = "sLC", key = "'productSearch' + #condition.productName + ':' + #condition.factory + ':' + #condition.modelClassification + ':' + #pageable.pageNumber", cacheManager = "redisCacheManager")
     public PageCustom<ProductDto.productSearchResult> searchProducts(ProductDto.productCondition condition, Pageable pageable) {
         return productRepository.searchProduct(condition, pageable);
     }
