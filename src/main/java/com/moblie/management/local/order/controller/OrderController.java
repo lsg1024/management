@@ -4,16 +4,11 @@ import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
 import com.moblie.management.local.member.service.MemberService;
-import com.moblie.management.local.order.dto.OrderDto;
-import com.moblie.management.local.order.model.OrderProductCart;
-import com.moblie.management.local.order.service.OrderProductService;
 import com.moblie.management.local.order.service.OrderService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -21,17 +16,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
 
     private final MemberService memberService;
-    private final OrderProductService orderProductService;
     private final OrderService orderService;
+
     @PostMapping("/product/order")
     public ResponseEntity<?> newOrder(
-            @RequestBody @Valid OrderDto.ProductsDto productsDto) {
+            @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        OrderProductCart products = orderProductService.createProductsOrder(productsDto);
-        orderService.createOrderRequest(products);
+        isAccess(principalDetails.getEmail());
+        orderService.createOrder(principalDetails.getId());
 
         return ResponseEntity.ok("성공");
     }
 
+    private void isAccess(String email) {
+        if (memberService.isAccess(email)) {
+            throw new CustomException(ErrorCode.ERROR_409, "권한이 없는 사용자 입니다.");
+        }
+    }
 
 }

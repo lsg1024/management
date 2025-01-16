@@ -1,4 +1,4 @@
-package com.moblie.management.local.order.repository;
+package com.moblie.management.local.order.repository.order_product_cart;
 
 import com.moblie.management.global.utils.PageCustom;
 import com.moblie.management.local.order.dto.OrderDto;

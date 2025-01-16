@@ -28,8 +28,8 @@ public class OrderProductCart extends BaseEntity {
             cascade = {PERSIST, MERGE})
     private List<OrderProduct> orderProducts = new ArrayList<>(); // 주문 상품들
 
-    @Builder
-    public OrderProductCart(List<OrderProduct> orderProducts) {
+    @Builder(access = AccessLevel.PROTECTED)
+    protected OrderProductCart(List<OrderProduct> orderProducts) {
         this.orderProducts = orderProducts;
     }
 
