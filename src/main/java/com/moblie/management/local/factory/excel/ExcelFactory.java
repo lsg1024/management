@@ -17,9 +17,9 @@ public class ExcelFactory {
 
             if (row == null) continue;
 
-            FactoryDto.createFactory createFactory = new FactoryDto.createFactory(row.getCell(5).getStringCellValue().toUpperCase());
+            FactoryDto.factory factory = new FactoryDto.factory(row.getCell(5).getStringCellValue().toUpperCase());
 
-            factoryInfo.factories.add(createFactory);
+            factoryInfo.factories.add(factory);
         }
     }
 }
