@@ -1,11 +1,10 @@
 package com.moblie.management.local.order.repository.order_product_cart;
 
 import com.moblie.management.global.utils.PageCustom;
-import com.moblie.management.local.order.dto.OrderDto;
+import com.moblie.management.local.order.dto.CartDto;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface OrderProductCartCustom {
-    List<OrderDto.productInfoDto> findAll(String userId);
+    PageCustom<CartDto.carts> findCartAll(String userId, Pageable pageable);
+    PageCustom<CartDto.productDetail> findCartProductDetail(String userId, String cartId, Pageable pageable);
 }
