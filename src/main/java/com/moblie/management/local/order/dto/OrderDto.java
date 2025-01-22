@@ -43,7 +43,8 @@ public class OrderDto {
     @Getter
     @NoArgsConstructor
     public static class productInfoDto {
-        private String uniqueNumber;
+        private String cartTrackingId;
+        private String storeName;
         private String productId;
         private String productName;
         private String factory;
@@ -54,8 +55,9 @@ public class OrderDto {
         private int amount;
 
         @QueryProjection
-        public productInfoDto(String uniqueNumber, String productId, String productName, String factory, String productGoldType, String productColor, String productWeight, String productRequestNote, int amount) {
-            this.uniqueNumber = uniqueNumber;
+        public productInfoDto(String cartTrackingId, String storeName, String productId, String productName, String factory, String productGoldType, String productColor, String productWeight, String productRequestNote, int amount) {
+            this.cartTrackingId = cartTrackingId;
+            this.storeName = storeName;
             this.productId = productId;
             this.productName = productName;
             this.factory = factory;
