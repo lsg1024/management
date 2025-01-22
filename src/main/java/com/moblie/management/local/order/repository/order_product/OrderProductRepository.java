@@ -10,6 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderProductRepository extends JpaRepository<OrderProduct, Long> {
-    Optional<OrderProduct> findByUniqueNumber(String product_id);
+    Optional<OrderProduct> findByOrderProductTrackingNumber(String productTrackingNumber);
     List<OrderProduct> findByOrderProductCart(OrderProductCart cart);
 }

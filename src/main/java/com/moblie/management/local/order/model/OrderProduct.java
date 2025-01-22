@@ -1,5 +1,6 @@
 package com.moblie.management.local.order.model;
 
+import com.moblie.management.local.order.dto.CartDto;
 import com.moblie.management.local.order.dto.OrderDto;
 import com.moblie.management.local.product.model.ProductEntity;
 import jakarta.persistence.*;
@@ -17,7 +18,7 @@ public class OrderProduct {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_product_id")
     private Long id;
-    private String uniqueNumber;
+    private String orderProductTrackingNumber;
     @Column(nullable = false)
     private String productGoldType;
     @Column(nullable = false)
@@ -33,11 +34,11 @@ public class OrderProduct {
     private OrderProductCart orderProductCart;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tracking_id", referencedColumnName = "tracking_id")
+    @JoinColumn(name = "order_id", referencedColumnName = "tracking_id")
     private Order order;
 
     public OrderProduct(String productGoldType, String productOrderColor, String productOrderRequestNote, int new_amount, ProductEntity product) {
-        this.uniqueNumber = String.valueOf(UUID.randomUUID());
+        this.orderProductTrackingNumber = String.valueOf(UUID.randomUUID());
         this.productGoldType = productGoldType;
         this.productOrderColor = productOrderColor;
         this.productOrderRequestNote = productOrderRequestNote;
@@ -45,7 +46,7 @@ public class OrderProduct {
         this.product = product;
     }
 
-    public static OrderProduct createOrders(OrderDto.createDto createDto, ProductEntity product) {
+    public static OrderProduct createOrders(CartDto.addProduct createDto, ProductEntity product) {
 
         return new OrderProduct(
                 createDto.getProductGoldType(),
