@@ -62,6 +62,14 @@ public class OrderProductCart extends BaseEntity {
         this.totalProducts = products;
     }
 
+    public Store getStore() {
+        return this.store;
+    }
+
+    public boolean canProcessOrder() {
+        return totalProducts > 0 && store != null;
+    }
+
     public List<OrderProduct> getOrderProducts() {
         return Collections.unmodifiableList(orderProducts);
     }

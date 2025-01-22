@@ -43,7 +43,7 @@ public class OrderProductCartController {
     public ResponseEntity<?> addProductToCart(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam(name = "id") String cartId,
-            @RequestParam(name = "productId") String productId,
+            @RequestParam(name = "product") String productId,
             @Valid @RequestBody CartDto.addProduct product) {
 
         isAccess(principalDetails.getEmail());
@@ -56,7 +56,7 @@ public class OrderProductCartController {
     @PatchMapping("/cart")
     public ResponseEntity<?> updateCartProduct(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestParam(name = "trackingId") String trackingId,
+            @RequestParam(name = "tracking") String trackingId,
             @RequestBody @Valid OrderDto.updateDto productsDto) {
 
         isAccess(principalDetails.getEmail());
@@ -85,10 +85,10 @@ public class OrderProductCartController {
     }
 
     //장바구나 상품 삭제
-    @DeleteMapping("/cart/{cartId}")
+    @DeleteMapping("/cart/{cart}")
     public ResponseEntity<?> deleteCartProduct(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable(name = "cartId") String cartId,
+            @PathVariable(name = "cart") String cartId,
             @RequestParam(name = "product") String trackingId) {
         log.info("cartId: {}, product: {}", cartId, trackingId);
         isAccess(principalDetails.getEmail());

@@ -51,10 +51,10 @@ public class OrderProductCartService {
     @Transactional
     public void addProductToCart(String cartId, String productId, CartDto.addProduct productDto) {
         OrderProductCart cart = orderProductCartRepository.findById(Long.valueOf(cartId))
-                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404));
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "장바구니 없음"));
 
         ProductEntity product = productRepository.findById(Long.valueOf(productId))
-                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404));
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "상품 없음"));
 
         try {
             OrderProduct orderProduct = OrderProduct.createOrders(productDto, product);
