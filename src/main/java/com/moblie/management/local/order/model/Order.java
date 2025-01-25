@@ -27,7 +27,7 @@ public class Order extends BaseEntity {
     @Column(name = "tracking_id", unique = true)
     private String trackingId;
 
-    @OneToOne(cascade = {PERSIST})
+    @ManyToOne(cascade = {PERSIST}, fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")
     private Store store;
 
