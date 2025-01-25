@@ -5,17 +5,18 @@ import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
 import com.moblie.management.global.redis.domain.IdempotencyToken;
 import com.moblie.management.global.redis.service.IdempotencyService;
+import com.moblie.management.global.utils.PageCustom;
 import com.moblie.management.local.member.service.MemberService;
+import com.moblie.management.local.order.dto.OrderDto;
 import com.moblie.management.local.order.dto.OrderResponse;
 import com.moblie.management.local.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -48,11 +49,20 @@ public class OrderController {
         return ResponseEntity.ok(new OrderResponse("주문 완료"));
     }
 
+    @GetMapping("/orders")
+    public PageCustom<OrderDto.orderInfoDto> searchOrders(
+            @RequestParam(name = "store") String storeName,
+            @RequestParam(name = "status") String status,
+            @PageableDefault(size = 20) Pageable pageable) {
+
+        OrderDto.orderCondition condition = new OrderDto.orderCondition(storeName, status);
+
+        return orderService.searchOrders(condition, pageable);
+    }
+
     @PostMapping("/order/approve")
     public ResponseEntity<OrderResponse> approveOrder(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam(name = "order") String trackingId) {
-        isAccess(principalDetails.getEmail());
 
         orderService.orderApproval(trackingId);
 

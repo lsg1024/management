@@ -82,7 +82,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/signup", "/login", "/reissue", "/images/**").permitAll()
                         .requestMatchers("/product/**", "/factory/**").hasAnyAuthority("USER", "ADMIN")
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/orders", "/order/approve", "/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling((ex) -> ex.accessDeniedHandler(customAccessDeniedHandler));
 

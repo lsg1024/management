@@ -69,4 +69,31 @@ public class OrderDto {
         }
     }
 
+    @Getter
+    @NoArgsConstructor
+    public static class orderCondition {
+        private String storeName;
+        private String status;
+
+        public orderCondition(String storeName, String status) {
+            this.storeName = storeName;
+            this.status = status;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class orderInfoDto {
+        private String store;
+        private String date;
+        private String orderStatus;
+
+        @QueryProjection
+        public orderInfoDto(String store, String date, String orderStatus) {
+            this.store = store;
+            this.date = date;
+            this.orderStatus = orderStatus;
+        }
+    }
+
 }

@@ -4,6 +4,8 @@ import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
 import com.moblie.management.global.redis.service.IdempotencyService;
+import com.moblie.management.global.utils.PageCustom;
+import com.moblie.management.local.order.dto.OrderDto;
 import com.moblie.management.local.order.model.Order;
 import com.moblie.management.local.order.model.OrderProduct;
 import com.moblie.management.local.order.model.OrderProductCart;
@@ -12,6 +14,7 @@ import com.moblie.management.local.order.repository.order_product.OrderProductRe
 import com.moblie.management.local.order.repository.order.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +51,9 @@ public class OrderService {
     }
 
     //주문 상품 승인 & 미승인 리스트 (승인/미승인 카테고리 검색)
+    public PageCustom<OrderDto.orderInfoDto> searchOrders(OrderDto.orderCondition condition, Pageable pageable) {
+        return orderRepository.findOrderInfo(condition, pageable);
+    }
 
     //주문 상품 승인
     @Transactional
