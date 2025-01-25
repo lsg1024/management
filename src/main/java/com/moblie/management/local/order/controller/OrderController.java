@@ -3,6 +3,8 @@ package com.moblie.management.local.order.controller;
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
+import com.moblie.management.global.redis.domain.IdempotencyToken;
+import com.moblie.management.global.redis.service.IdempotencyService;
 import com.moblie.management.local.member.service.MemberService;
 import com.moblie.management.local.order.dto.OrderResponse;
 import com.moblie.management.local.order.service.OrderService;
@@ -11,8 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -21,14 +26,24 @@ public class OrderController {
 
     private final MemberService memberService;
     private final OrderService orderService;
+    private final IdempotencyService idempotencyService;
 
     @PostMapping("/product/order")
     public ResponseEntity<?> newOrder(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @RequestHeader(name = "idempotency") String idempotency,
             @RequestParam(name = "cart") String cartId) {
 
         isAccess(principalDetails.getEmail());
+
+        Optional<IdempotencyToken> idempotencyToken = idempotencyService.getToken(principalDetails.getEmail());
+        if (idempotencyToken.isPresent()) {
+            if (idempotencyToken.get().getIdempotencyValue().equals(idempotency)) {
+                throw new CustomException(ErrorCode.ERROR_409, "중복된 요청입니다.");
+            }
+        }
         orderService.createOrder(principalDetails.getId(), cartId);
+        idempotencyService.createToken(principalDetails.getEmail(), idempotency);
 
         return ResponseEntity.ok(new OrderResponse("주문 완료"));
     }
@@ -39,7 +54,6 @@ public class OrderController {
             @RequestParam(name = "order") String trackingId) {
         isAccess(principalDetails.getEmail());
 
-        log.info("trackingId {}", trackingId);
         orderService.orderApproval(trackingId);
 
         return ResponseEntity.ok(new OrderResponse("승인 완료"));

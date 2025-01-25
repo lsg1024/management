@@ -2,6 +2,8 @@ package com.moblie.management.local.order.service;
 
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
+import com.moblie.management.global.jwt.dto.PrincipalDetails;
+import com.moblie.management.global.redis.service.IdempotencyService;
 import com.moblie.management.local.order.model.Order;
 import com.moblie.management.local.order.model.OrderProduct;
 import com.moblie.management.local.order.model.OrderProductCart;
@@ -39,6 +41,7 @@ public class OrderService {
             product.setOrder(order);
             order.addProduct(product);
         }
+
         orderRepository.save(order);
         orderProductCartRepository.delete(cart);
 
