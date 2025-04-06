@@ -5,6 +5,7 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.spring.data.connection.RedissonConnectionFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -23,6 +24,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RedissonConfig {
 
+    @Value("${REDIS_PASSWORD}")
+    private String password;
+
     private final RedisClusterProperties redisClusterProperties;
 
     @Bean
@@ -34,6 +38,7 @@ public class RedissonConfig {
                 .toArray(String[]::new);
 
         config.useClusterServers()
+                .setPassword(password)
                 .addNodeAddress(nodeAddresses)
                 .setScanInterval(2000)  // 클러스터 스캔 주기 설정 (밀리초)
                 .setConnectTimeout(5000)  // 연결 시간 제한 (밀리초)

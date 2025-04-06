@@ -73,4 +73,13 @@ public class MemberDto {
         private String password;
     }
 
+    @Getter @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberInfo {
+        private String userId;
+        private String email;
+        private String role;
+    }
+
 }

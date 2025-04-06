@@ -1,5 +1,6 @@
 package com.moblie.management.local.member.model;
 
+import com.moblie.management.local.member.dto.MemberDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -39,14 +40,18 @@ public class MemberEntity {
         this.role = role;
     }
 
+    public MemberDto.MemberInfo getMemberInfo() {
+        return new MemberDto.MemberInfo(this.userid.toString(), this.email, this.role.toString());
+    }
+
     public boolean isUserNameExist() {
         return username != null;
     }
     public boolean isEmailExist() {
         return email != null;
     }
-    public void updateUserNameAndEmail(String username, String email) {
-        this.username = username;
+    public void updateNicknameAndEmail(String nickname, String email) {
+        this.nickname = nickname;
         this.email = email;
     }
     public void updatePassword(String password) {

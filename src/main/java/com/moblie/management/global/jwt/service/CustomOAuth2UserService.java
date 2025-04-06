@@ -38,36 +38,31 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return null;
         }
 
-        String username = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
+        MemberEntity member = processOAuth2User(oAuth2Response);
+        return new PrincipalDetails(member, oAuth2User.getAttributes());
+    }
 
+    public MemberEntity processOAuth2User(OAuth2Response oAuth2Response) {
+        String username = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
         String email = oAuth2Response.getEmail();
+        String nickname = oAuth2Response.getName();
 
-        MemberEntity findUsernameAndEmail = memberRepository.findByUsernameAndEmail(username, email);
+        MemberEntity member = memberRepository.findByUsernameAndEmail(username, email);
 
-        log.info("findUsernameAndEmail = {}", findUsernameAndEmail);
-
-        if (findUsernameAndEmail == null) {
-
-            findUsernameAndEmail = MemberEntity.builder()
+        if (member == null) {
+            log.info("신규 회원 가입 처리");
+            member = MemberEntity.builder()
                     .username(username)
                     .email(email)
-                    .role(Role.WAIT)
+                    .nickname(nickname)
+                    .role(Role.USER)
                     .build();
-
-            memberRepository.save(findUsernameAndEmail);
-
-            return new PrincipalDetails(findUsernameAndEmail, oAuth2User.getAttributes());
-
-        } else if (findUsernameAndEmail.isEmailExist() && !findUsernameAndEmail.isUserNameExist()) {
-            OAuth2Error oAuth2Error = new OAuth2Error("error");
-            throw new OAuth2AuthenticationException(oAuth2Error, oAuth2Error.toString());
-        } else {
-            findUsernameAndEmail.updateUserNameAndEmail(oAuth2Response.getName(), email);
-
-            memberRepository.save(findUsernameAndEmail);
-
-            return new PrincipalDetails(findUsernameAndEmail, oAuth2User.getAttributes());
+            return memberRepository.save(member);
         }
 
+        log.info("기존 회원 업데이트 처리");
+        member.updateNicknameAndEmail(nickname, email);
+        return memberRepository.save(member);
     }
+
 }
