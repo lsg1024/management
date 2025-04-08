@@ -32,16 +32,18 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String accessToken = request.getHeader("access");
-
         // 토큰이 없다면 다음 필터로 넘김
-        if (accessToken == null) {
+        String authorizationHeader = request.getHeader("Authorization");
 
-            filterChain.doFilter(request , response);
+        // 헤더가 없거나 Bearer 타입이 아니면 다음 필터로 넘김
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
             return;
         }
 
         // 토큰 만료 여부 확인, 만료시 다음 필터로 넘기지 않음
+        String accessToken = authorizationHeader.substring(7);
+
         try {
             jwtUtil.isExpired(accessToken);
         } catch (ExpiredJwtException e) {

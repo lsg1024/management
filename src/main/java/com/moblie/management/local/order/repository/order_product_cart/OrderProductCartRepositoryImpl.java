@@ -14,6 +14,7 @@ import static com.moblie.management.local.order.model.QOrderProduct.orderProduct
 import static com.moblie.management.local.order.model.QOrderProductCart.orderProductCart;
 import static com.moblie.management.local.product.model.QProductEntity.productEntity;
 import static com.moblie.management.local.store.model.QStore.store;
+import static com.moblie.management.local.product.model.QClassificationEntity.classificationEntity;
 
 public class OrderProductCartRepositoryImpl implements OrderProductCartCustom{
     private final JPAQueryFactory query;
@@ -48,7 +49,7 @@ public class OrderProductCartRepositoryImpl implements OrderProductCartCustom{
                 .select(new QCartDto_productDetail(
                         orderProduct.orderProductTrackingNumber,
                         productEntity.productName,
-                        productEntity.productClassification,
+                        classificationEntity.classificationName,
                         orderProduct.productGoldType,
                         orderProduct.productOrderColor,
                         productEntity.productWeight,

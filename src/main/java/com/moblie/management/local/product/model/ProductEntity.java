@@ -24,8 +24,8 @@ public class ProductEntity extends BaseEntity {
 
     @Column(unique = true, nullable = false)
     private String productName;
-    @Column(nullable = false)
-    private String productClassification;
+//    @Column(nullable = false)
+//    private String productClassification;
     @Column(nullable = false)
     private String productMaterial;
     @Column(nullable = false)
@@ -43,6 +43,10 @@ public class ProductEntity extends BaseEntity {
     @JoinColumn(name = "userId", nullable = false)
     private MemberEntity member;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "classificationId", nullable = false)
+    private ClassificationEntity classification;
+
     @OneToMany(
             mappedBy = "product",
             orphanRemoval = true,
@@ -50,11 +54,11 @@ public class ProductEntity extends BaseEntity {
     private List<ProductImageEntity> productImageEntities = new ArrayList<>();
 
     @Builder
-    private ProductEntity(String productName, FactoryEntity factory, MemberEntity member ,String productClassification, String productMaterial, String productColor, String productWeight, String productNote, String productBarcodeNumber) {
+    private ProductEntity(String productName, FactoryEntity factory, MemberEntity member, ClassificationEntity classification, String productMaterial, String productColor, String productWeight, String productNote, String productBarcodeNumber) {
         this.productName = productName;
         this.factory = factory;
         this.member = member;
-        this.productClassification = productClassification;
+        this.classification = classification;
         this.productMaterial = productMaterial;
         this.productColor = productColor;
         this.productWeight = productWeight;
@@ -63,12 +67,12 @@ public class ProductEntity extends BaseEntity {
     }
 
 
-    public static ProductEntity create(ProductDto.createProduct productDto, MemberEntity member, FactoryEntity factory) {
+    public static ProductEntity create(ProductDto.createProduct productDto, MemberEntity member, ClassificationEntity classification, FactoryEntity factory) {
         return ProductEntity.builder()
                 .productName(productDto.getProductName())
                 .factory(factory)
                 .member(member)
-                .productClassification(productDto.getModelClassification())
+                .classification(classification)
                 .productMaterial(productDto.getGoldType())
                 .productColor(productDto.getGoldColor())
                 .productWeight(productDto.getModelWeight())
@@ -77,13 +81,14 @@ public class ProductEntity extends BaseEntity {
                 .build();
     }
 
-    public void productUpdate(ProductDto.productUpdate productUpdate, FactoryEntity factory) {
+    public void productUpdate(ProductDto.productUpdate productUpdate, ClassificationEntity classification, FactoryEntity factory) {
         if (factory == null) {
             throw new CustomException(ErrorCode.ERROR_400, "유효하지 않은 공장 정보");
         }
         this.productName = productUpdate.getProductName();
         this.factory = factory;
-        this.productClassification = productUpdate.getModelClassification();
+        this.classification = classification;
+//        this.productClassification = productUpdate.getModelClassification();
         this.productMaterial = productUpdate.getGoldType();
         this.productColor = productUpdate.getGoldColor();
         this.productWeight = productUpdate.getModelWeight();

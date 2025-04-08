@@ -5,7 +5,9 @@ import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.local.factory.model.FactoryEntity;
 import com.moblie.management.local.factory.repository.FactoryRepository;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
+import com.moblie.management.local.product.model.ClassificationEntity;
 import com.moblie.management.local.product.model.ProductEntity;
+import com.moblie.management.local.product.repository.ClassificationRepository;
 import com.moblie.management.local.product.repository.ProductRepository;
 import com.moblie.management.local.member.model.MemberEntity;
 import com.moblie.management.local.member.repository.MemberRepository;
@@ -38,6 +40,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final FactoryRepository factoryRepository;
     private final MemberRepository memberRepository;
+    private final ClassificationRepository classificationRepository;
 
     //상품 엑셀 파일 자동호출
     @Transactional
@@ -68,8 +71,9 @@ public class ProductService {
 
         ProductValidation.validateProductName(productRepository, updateDto.getProductName());
         FactoryEntity factory = factoryRepository.findByFactoryName(updateDto.getFactory());
+        ClassificationEntity classification = classificationRepository.findByClassificationName(updateDto.getModelClassification());
 
-        product.productUpdate(updateDto, factory);
+        product.productUpdate(updateDto, classification, factory);
     }
 
     //상품 조회
@@ -116,9 +120,18 @@ public class ProductService {
             validateProductDto(productRepository, factoryRepository, productDto, error);
 
             FactoryEntity factory = factoryRepository.findByFactoryName(productDto.getFactory());
+            ClassificationEntity classification = classificationRepository.findByClassificationName(productDto.getModelClassification());
+
+            if (classification == null) {
+                classification = ClassificationEntity.builder()
+                        .classificationName(productDto.getModelClassification())
+                        .build();
+
+                classificationRepository.save(classification);
+            }
 
             if (error.isEmpty()) {
-                ProductEntity productEntity = ProductEntity.create(productDto, member, factory);
+                ProductEntity productEntity = ProductEntity.create(productDto, member, classification, factory);
                 productEntities.add(productEntity);
             } else {
                 errorSet.addAll(error);

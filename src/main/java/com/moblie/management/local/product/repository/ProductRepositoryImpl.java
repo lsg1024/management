@@ -14,7 +14,7 @@ import java.util.List;
 
 import static com.moblie.management.local.factory.model.QFactoryEntity.factoryEntity;
 import static com.moblie.management.local.product.model.QProductEntity.productEntity;
-
+import static com.moblie.management.local.product.model.QClassificationEntity.classificationEntity;
 
 public class ProductRepositoryImpl implements ProductRepositoryCustom{
 
@@ -52,14 +52,14 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
             whereClause.and(factoryEntity.factoryName.eq(condition.getFactory()));
         }
         if (StringUtils.hasText(condition.getModelClassification())) {
-            whereClause.and(productEntity.productClassification.eq(condition.getModelClassification()));
+            whereClause.and(classificationEntity.classificationName.eq(condition.getModelClassification()));
         }
 
         List<ProductDto.productSearchResult> content = query
                 .select(Projections.constructor(ProductDto.productSearchResult.class,
                         productEntity.productName,
                         factoryEntity.factoryName,
-                        productEntity.productClassification,
+                        classificationEntity.classificationName,
                         productEntity.productMaterial,
                         productEntity.productColor,
                         productEntity.productWeight,
