@@ -67,6 +67,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
                 ))
                 .from(productEntity)
                 .join(productEntity.factory, factoryEntity)
+                .join(productEntity.classification, classificationEntity)
                 .where(whereClause)
                 .orderBy(productEntity.productName.asc())
                 .offset(pageable.getOffset())
@@ -77,6 +78,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
                 .select(productEntity.count())
                 .from(productEntity)
                 .leftJoin(productEntity.factory, factoryEntity)
+                .leftJoin(productEntity.classification, classificationEntity)
                 .where(whereClause);
 
         // PageCustom 객체로 변환하여 반환

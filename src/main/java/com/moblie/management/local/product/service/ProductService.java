@@ -58,7 +58,7 @@ public class ProductService {
     
     //상품 수동 입력
     @Transactional
-    public List<String> createManualProduct(PrincipalDetails principalDetails, ProductDto.productsInfo productsInfo) throws IOException {
+    public List<String> createManualProduct(PrincipalDetails principalDetails, ProductDto.productsInfo productsInfo) {
         return createManualProductProcess(productsInfo, principalDetails.getId());
     }
 
@@ -91,7 +91,7 @@ public class ProductService {
         product.delete();
     }
 
-    private List<String> createAutoProductProcess(ProductDto.productsInfo productsInfo, String memberId) throws IOException {
+    private List<String> createAutoProductProcess(ProductDto.productsInfo productsInfo, String memberId)  {
         List<String> errors = new ArrayList<>();
 
         extractedProductInfo(productsInfo, memberId, errors);
@@ -99,7 +99,7 @@ public class ProductService {
         return errors;
     }
 
-    private List<String> createManualProductProcess(ProductDto.productsInfo productsInfo, String memberId) throws IOException {
+    private List<String> createManualProductProcess(ProductDto.productsInfo productsInfo, String memberId){
         List<String> errors = new ArrayList<>();
 
         extractedProductInfo(productsInfo, memberId, errors);
@@ -107,7 +107,7 @@ public class ProductService {
         return errors;
     }
 
-    private void extractedProductInfo(ProductDto.productsInfo productsInfo, String memberId, List<String> errorProduct) throws IOException {
+    private void extractedProductInfo(ProductDto.productsInfo productsInfo, String memberId, List<String> errorProduct)  {
         Set<String> errorSet = new HashSet<>();
 
         MemberEntity member = memberRepository.findById(Long.valueOf(memberId))
@@ -117,18 +117,10 @@ public class ProductService {
         for (ProductDto.createProduct productDto : productsInfo.products) {
 
             Set<String> error = new HashSet<>();
-            validateProductDto(productRepository, factoryRepository, productDto, error);
+            validateProductDto(productRepository, factoryRepository, classificationRepository, productDto, error);
 
             FactoryEntity factory = factoryRepository.findByFactoryName(productDto.getFactory());
             ClassificationEntity classification = classificationRepository.findByClassificationName(productDto.getModelClassification());
-
-            if (classification == null) {
-                classification = ClassificationEntity.builder()
-                        .classificationName(productDto.getModelClassification())
-                        .build();
-
-                classificationRepository.save(classification);
-            }
 
             if (error.isEmpty()) {
                 ProductEntity productEntity = ProductEntity.create(productDto, member, classification, factory);

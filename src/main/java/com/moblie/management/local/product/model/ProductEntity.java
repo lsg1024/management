@@ -43,7 +43,7 @@ public class ProductEntity extends BaseEntity {
     @JoinColumn(name = "userId", nullable = false)
     private MemberEntity member;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classificationId", nullable = false)
     private ClassificationEntity classification;
 
