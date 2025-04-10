@@ -173,7 +173,7 @@ public class MemberService {
         try {
             jwtUtil.isExpired(refresh);
         } catch (ExpiredJwtException e) {
-            throw new CustomException(ErrorCode.ERROR_401, "Refresh 토큰 만료");
+            throw new CustomException(ErrorCode.ERROR_407, "토큰 만료");
         }
 
         String category = jwtUtil.getCategory(refresh);
