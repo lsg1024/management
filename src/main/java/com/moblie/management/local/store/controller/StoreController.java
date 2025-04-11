@@ -6,7 +6,7 @@ import com.moblie.management.global.jwt.dto.PrincipalDetails;
 import com.moblie.management.global.utils.PageCustom;
 import com.moblie.management.local.member.service.MemberService;
 import com.moblie.management.local.store.dto.StoreDto;
-import com.moblie.management.local.store.dto.StoreResponse;
+import com.moblie.management.global.utils.Response;
 import com.moblie.management.local.store.service.StoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +26,17 @@ public class StoreController {
 
     //생성
     @PostMapping("/new")
-    public ResponseEntity<StoreResponse> newStore(
+    public ResponseEntity<Response> newStore(
             @Valid @RequestBody StoreDto.commonDto storeDto) {
 
         storeService.createStore(storeDto);
 
-        return ResponseEntity.ok(new StoreResponse("생성 완료"));
+        return ResponseEntity.ok(new Response("생성 완료"));
     }
 
     //수정
     @PatchMapping("/update/{store_id}")
-    public ResponseEntity<StoreResponse> updateStore(
+    public ResponseEntity<Response> updateStore(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable(name = "store_id") String storeId,
             @Valid @RequestBody StoreDto.commonDto updateDto) {
@@ -44,7 +44,7 @@ public class StoreController {
         isAccess(principalDetails.getEmail());
         storeService.updateStore(storeId, updateDto);
 
-        return ResponseEntity.ok(new StoreResponse("수정 완료"));
+        return ResponseEntity.ok(new Response("수정 완료"));
     }
 
     //조회
@@ -60,14 +60,14 @@ public class StoreController {
 
     //삭제
     @DeleteMapping("/delete/{store_id}")
-    public ResponseEntity<StoreResponse> deleteStore(
+    public ResponseEntity<Response> deleteStore(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable(name = "store_id") String storeId) {
 
         isAccess(principalDetails.getEmail());
         storeService.deleteStore(principalDetails.getId(), storeId);
 
-        return ResponseEntity.ok(new StoreResponse("삭제 완료"));
+        return ResponseEntity.ok(new Response("삭제 완료"));
     }
 
     private void isAccess(String email) {

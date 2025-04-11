@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
+import com.moblie.management.global.utils.Response;
 import com.moblie.management.local.member.service.MemberService;
 import com.moblie.management.local.product.dto.ProductDto;
-import com.moblie.management.local.product.dto.ProductResponse;
+import com.moblie.management.global.utils.Response;
 import com.moblie.management.local.product.service.ProductImageService;
 import com.moblie.management.local.product.service.ProductService;
 import jakarta.validation.Valid;
@@ -33,13 +34,13 @@ public class ProductController {
     private final ProductImageService productImageService;
 
     @PostMapping("/products/new")
-    public ResponseEntity<ProductResponse> uploadExcelFile(
+    public ResponseEntity<Response> uploadExcelFile(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam MultipartFile file) throws IOException {
 
         List<String> errors = productService.createAutoProduct(principalDetails, file);
 
-        return errors.isEmpty() ? ResponseEntity.ok(new ProductResponse("저장 완료")) : ResponseEntity.ok(new ProductResponse("중복 데이터가 존재합니다", errors));
+        return errors.isEmpty() ? ResponseEntity.ok(new Response("저장 완료")) : ResponseEntity.ok(new Response("중복 데이터가 존재합니다", errors));
     }
 
     /**
@@ -48,7 +49,7 @@ public class ProductController {
      * @return 저장되지 않은 값들 상품 이름 반환
      */
     @PostMapping(value = "/product/new")
-    public ResponseEntity<ProductResponse> createProduct(
+    public ResponseEntity<Response> createProduct(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam(value = "images", required = false) List<MultipartFile> images,
             @RequestParam("products") String products) throws IOException {
@@ -58,11 +59,11 @@ public class ProductController {
 
         productImageService.createImages(productsDto, images);
 
-        return errors.isEmpty() ? ResponseEntity.ok(new ProductResponse("저장 완료")) : ResponseEntity.ok(new ProductResponse("중복 데이터가 존재합니다", errors));
+        return errors.isEmpty() ? ResponseEntity.ok(new Response("저장 완료")) : ResponseEntity.ok(new Response("중복 데이터가 존재합니다", errors));
     }
 
     @PatchMapping("/product/{productId}/edit")
-    public ResponseEntity<ProductResponse> updateProduct(
+    public ResponseEntity<Response> updateProduct(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable("productId") String productId,
             @RequestBody @Valid ProductDto.productUpdate updateDto) {
@@ -71,11 +72,11 @@ public class ProductController {
 
         productService.updateProduct(productId, updateDto);
 
-        return ResponseEntity.ok(new ProductResponse("수정 완료"));
+        return ResponseEntity.ok(new Response("수정 완료"));
     }
 
     @PatchMapping("/product/{productId}/image")
-    public ResponseEntity<ProductResponse> updateProductImage(
+    public ResponseEntity<Response> updateProductImage(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable("productId") String productId,
             @RequestParam(value = "images", required = false) List<MultipartFile> images) throws IOException {
@@ -83,7 +84,7 @@ public class ProductController {
         isAccess(principalDetails.getEmail());
         productImageService.updateImages(productId, images);
 
-        return ResponseEntity.ok(new ProductResponse("수정 완료"));
+        return ResponseEntity.ok(new Response("수정 완료"));
     }
 
     @GetMapping("/product/search")
@@ -103,16 +104,16 @@ public class ProductController {
     }
 
     @DeleteMapping("/product/{productId}")
-    public ResponseEntity<ProductResponse> deleteProduct(
+    public ResponseEntity<Response> deleteProduct(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable String productId) {
         isAccess(principalDetails.getEmail());
         productService.deletedProduct(productId);
-        return ResponseEntity.ok(new ProductResponse("삭제 완료"));
+        return ResponseEntity.ok(new Response("삭제 완료"));
     }
 
     @DeleteMapping("/product/{productId}/{image}")
-    public ResponseEntity<ProductResponse> deleteProductImage(
+    public ResponseEntity<Response> deleteProductImage(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable(value = "productId") String productId,
             @PathVariable(value = "image") String imageId) {
@@ -120,7 +121,7 @@ public class ProductController {
         isAccess(principalDetails.getEmail());
         productImageService.deleteImage(productId, imageId);
 
-        return ResponseEntity.ok(new ProductResponse("삭제 완료"));
+        return ResponseEntity.ok(new Response("삭제 완료"));
     }
 
     private void isAccess(String email) {

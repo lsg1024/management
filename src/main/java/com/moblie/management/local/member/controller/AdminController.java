@@ -1,10 +1,9 @@
 package com.moblie.management.local.member.controller;
 
+import com.moblie.management.global.utils.Response;
 import com.moblie.management.local.member.dto.MemberDto;
-import com.moblie.management.local.member.dto.Response;
 import com.moblie.management.local.member.service.AdminService;
 import com.moblie.management.local.product.dto.ProductDto;
-import com.moblie.management.local.product.dto.ProductResponse;
 import com.moblie.management.local.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,22 +42,22 @@ public class AdminController {
 
     //상품 데이터 수정
     @PatchMapping("/product/{productId}/edit")
-    public ResponseEntity<ProductResponse> updateProduct(
+    public ResponseEntity<Response> updateProduct(
             @PathVariable("productId") String productId,
             @RequestBody @Valid ProductDto.productUpdate updateDto) {
 
         productService.updateProduct(productId, updateDto);
 
-        return ResponseEntity.ok(new ProductResponse("수정 완료"));
+        return ResponseEntity.ok(new Response("수정 완료"));
     }
 
     //상품 데이터 삭제
     @DeleteMapping("/product/{productId}")
-    public ResponseEntity<ProductResponse> deleteProduct(
+    public ResponseEntity<Response> deleteProduct(
             @PathVariable String productId) {
         productService.deletedProduct(productId);
 
-        return ResponseEntity.ok(new ProductResponse("삭제 완료"));
+        return ResponseEntity.ok(new Response("삭제 완료"));
     }
 
 }

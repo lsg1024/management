@@ -29,7 +29,6 @@ import java.util.*;
 
 import static com.moblie.management.global.utils.ExcelSheetUtil.*;
 import static com.moblie.management.local.product.util.ProductUtil.formatProductExcelData;
-import static com.moblie.management.local.product.validation.ProductValidation.*;
 
 @Slf4j
 @Service
@@ -117,7 +116,7 @@ public class ProductService {
         for (ProductDto.createProduct productDto : productsInfo.products) {
 
             Set<String> error = new HashSet<>();
-            validateProductDto(productRepository, factoryRepository, classificationRepository, productDto, error);
+            validation(productDto, error);
 
             FactoryEntity factory = factoryRepository.findByFactoryName(productDto.getFactory());
             ClassificationEntity classification = classificationRepository.findByClassificationName(productDto.getModelClassification());
@@ -134,6 +133,21 @@ public class ProductService {
         }
 
         errorProduct.addAll(errorSet);
+    }
+
+    private void validation(ProductDto.createProduct productDto, Set<String> error) {
+        if (!productRepository.existsByProductName(productDto.getProductName())) {
+            error.add("존재하지 않은 제품: " + productDto.getProductName());
+        }
+
+        if (!factoryRepository.existsByFactoryName(productDto.getFactory())) {
+            error.add("존재하지 않은 공장: " + productDto.getFactory());
+        }
+
+        if (!classificationRepository.existsByClassificationName(productDto.getModelClassification())) {
+            error.add("존재하지 않는 카테고리: " + productDto.getModelClassification());
+        }
+
     }
 
 }
