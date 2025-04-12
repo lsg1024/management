@@ -87,7 +87,7 @@ public class ProductService {
         ProductEntity product = productRepository.findById(Long.valueOf(productId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "상품 삭제를 실패하였습니다"));
         product.validateProductAccess(productId);
-        product.delete();
+        productRepository.delete(product);
     }
 
     private List<String> createAutoProductProcess(ProductDto.productsInfo productsInfo, String memberId)  {
@@ -136,12 +136,14 @@ public class ProductService {
     }
 
     private void validation(ProductDto.createProduct productDto, Set<String> error) {
-        if (!productRepository.existsByProductName(productDto.getProductName())) {
-            error.add("존재하지 않은 제품: " + productDto.getProductName());
+        if (productRepository.existsByProductName(productDto.getProductName())) {
+            error.add("중복된 상품 이: " + productDto.getProductName());
+            return;
         }
 
         if (!factoryRepository.existsByFactoryName(productDto.getFactory())) {
             error.add("존재하지 않은 공장: " + productDto.getFactory());
+            return;
         }
 
         if (!classificationRepository.existsByClassificationName(productDto.getModelClassification())) {

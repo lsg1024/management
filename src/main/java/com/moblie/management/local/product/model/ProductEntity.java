@@ -35,7 +35,7 @@ public class ProductEntity extends BaseEntity {
     private String productNote;
     @Column(unique = true)
     private String productBarcodeNumber;
-    private boolean deleted = false;
+    private boolean deleted = Boolean.FALSE;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "factoryId", nullable = false)
     private FactoryEntity factory;
@@ -112,10 +112,6 @@ public class ProductEntity extends BaseEntity {
 
     public Long getProductId() {
         return productId;
-    }
-
-    public void delete() {
-        this.deleted = true;
     }
 
 }
