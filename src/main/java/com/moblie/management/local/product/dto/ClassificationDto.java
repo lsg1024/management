@@ -10,12 +10,14 @@ import java.util.List;
 
 public class ClassificationDto {
 
+    @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ClassificationList {
         private List<String> classifications;
     }
 
+    @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Version {

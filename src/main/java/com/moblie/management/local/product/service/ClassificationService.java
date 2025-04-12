@@ -24,7 +24,7 @@ public class ClassificationService {
 
     // 카테고리 생성
     public int createClassification(String name) {
-        if (!classificationRepository.existsByClassificationName(name)) {
+        if (classificationRepository.existsByClassificationName(name)) {
             throw new CustomException(ErrorCode.ERROR_409);
         }
 
