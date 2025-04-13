@@ -13,6 +13,7 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -71,6 +72,15 @@ public class RedissonConfig {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setConnectionFactory(new RedissonConnectionFactory(redissonClient));
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, Integer> versionTemplate(RedissonClient redissonClient) {
+        RedisTemplate<String, Integer> template = new RedisTemplate<>();
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericToStringSerializer<>(Integer.class));
         template.setConnectionFactory(new RedissonConnectionFactory(redissonClient));
         return template;
     }

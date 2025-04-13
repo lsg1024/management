@@ -19,7 +19,7 @@ public class ClassificationService {
 
     private static final String VERSION_KEY = "classification:version";
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Integer> versionTemplate;
     private final ClassificationRepository classificationRepository;
 
     // 카테고리 생성
@@ -59,13 +59,13 @@ public class ClassificationService {
 
     // 버전 증가
     private int increaseVersion() {
-        Long newVersion = redisTemplate.opsForValue().increment(VERSION_KEY);
+        Long newVersion = versionTemplate.opsForValue().increment(VERSION_KEY);
         return newVersion != null ? newVersion.intValue() : 0;
     }
 
     // 현재 버전 조회
     public int getCurrentVersion() {
-        String versionStr = redisTemplate.opsForValue().get(VERSION_KEY);
-        return versionStr != null ? Integer.parseInt(versionStr) : 0;
+        Integer version = versionTemplate    .opsForValue().get(VERSION_KEY);
+        return version != null ? version : 0;
     }
 }
