@@ -48,10 +48,10 @@ public class StoreController {
     }
 
     //조회
-    @GetMapping("/list")
+    @GetMapping("/search")
     public PageCustom<StoreDto.storeSearchResponse> searchStore(
             @RequestParam("store_name") String storeName,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 16) Pageable pageable) {
 
         StoreDto.storeCondition condition = new StoreDto.storeCondition(storeName);
 
