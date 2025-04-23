@@ -2,6 +2,7 @@ package com.moblie.management.local.product.service;
 
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
+import com.moblie.management.global.redis.service.VersionedService;
 import com.moblie.management.local.product.dto.ClassificationDto;
 import com.moblie.management.local.product.model.ClassificationEntity;
 import com.moblie.management.local.product.repository.ClassificationRepository;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ClassificationService {
+public class ClassificationService extends VersionedService {
 
     private static final String VERSION_KEY = "classification:version";
 
@@ -56,16 +57,14 @@ public class ClassificationService {
         increaseVersion();
     }
 
-
-    // 버전 증가
-    private int increaseVersion() {
-        Long newVersion = versionTemplate.opsForValue().increment(VERSION_KEY);
-        return newVersion != null ? newVersion.intValue() : 0;
+    @Override
+    protected RedisTemplate<String, Integer> getVersionTemplate() {
+        return versionTemplate;
     }
 
-    // 현재 버전 조회
-    public int getCurrentVersion() {
-        Integer version = versionTemplate    .opsForValue().get(VERSION_KEY);
-        return version != null ? version : 0;
+    @Override
+    protected String getVersionKey() {
+        return VERSION_KEY;
     }
+
 }

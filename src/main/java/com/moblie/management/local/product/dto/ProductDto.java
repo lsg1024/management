@@ -16,7 +16,7 @@ public class ProductDto {
 
     @Getter @Setter
     @NoArgsConstructor
-    public static class createProduct {
+    public static class productInfo {
 
         @NotEmpty(message = "제품 이름을 입력해주세요.")
         private String productName;
@@ -28,7 +28,7 @@ public class ProductDto {
         private String modelNote;
         private String modelBarcode;
 
-        public createProduct(String productName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
+        public productInfo(String productName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
             this.productName = productName;
             this.factory = factory;
             this.modelClassification = modelClassification;
@@ -41,7 +41,7 @@ public class ProductDto {
 
     public static class productsInfo {
         @Valid @NotNull
-        public List<createProduct> products;
+        public List<productInfo> products;
     }
 
     @Getter

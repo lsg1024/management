@@ -21,15 +21,8 @@ public class ProductEntity extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
-
     @Column(unique = true, nullable = false)
     private String productName;
-//    @Column(nullable = false)
-//    private String productClassification;
-    @Column(nullable = false)
-    private String productMaterial;
-    @Column(nullable = false)
-    private String productColor;
     @Column(nullable = false)
     private String productWeight;
     private String productNote;
@@ -47,6 +40,14 @@ public class ProductEntity extends BaseEntity {
     @JoinColumn(name = "classificationId", nullable = false)
     private ClassificationEntity classification;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "materialId", nullable = false)
+    private MaterialEntity material;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "colorId", nullable = false)
+    private ColorEntity color;
+
     @OneToMany(
             mappedBy = "product",
             orphanRemoval = true,
@@ -54,43 +55,54 @@ public class ProductEntity extends BaseEntity {
     private List<ProductImageEntity> productImageEntities = new ArrayList<>();
 
     @Builder
-    private ProductEntity(String productName, FactoryEntity factory, MemberEntity member, ClassificationEntity classification, String productMaterial, String productColor, String productWeight, String productNote, String productBarcodeNumber) {
+    private ProductEntity(String productName, FactoryEntity factory, MemberEntity member, ClassificationEntity classification, MaterialEntity material, ColorEntity color, String productWeight, String productNote, String productBarcodeNumber) {
         this.productName = productName;
         this.factory = factory;
         this.member = member;
         this.classification = classification;
-        this.productMaterial = productMaterial;
-        this.productColor = productColor;
+        this.material = material;
+        this.color = color;
         this.productWeight = productWeight;
         this.productNote = productNote;
         this.productBarcodeNumber = productBarcodeNumber;
     }
 
 
-    public static ProductEntity create(ProductDto.createProduct productDto, MemberEntity member, ClassificationEntity classification, FactoryEntity factory) {
+    public static ProductEntity create(ProductDto.productInfo productDto, MemberEntity member, ClassificationEntity classification, MaterialEntity material, ColorEntity color, FactoryEntity factory) {
         return ProductEntity.builder()
                 .productName(productDto.getProductName())
                 .factory(factory)
                 .member(member)
                 .classification(classification)
-                .productMaterial(productDto.getGoldType())
-                .productColor(productDto.getGoldColor())
+                .material(material)
+                .color(color)
                 .productWeight(productDto.getModelWeight())
                 .productNote(productDto.getModelNote())
                 .productBarcodeNumber(productDto.getModelBarcode())
                 .build();
     }
 
-    public void productUpdate(ProductDto.productUpdate productUpdate, ClassificationEntity classification, FactoryEntity factory) {
+    public ProductDto.productInfo getProductDetailInfo() {
+        return new ProductDto.productInfo(
+                this.productName,
+                null,
+                this.classification.getClassificationName(),
+                this.material.getMaterialName(),
+                this.color.getColorName(),
+                this.productWeight,
+                this.productNote
+        );
+    }
+
+    public void productUpdate(ProductDto.productUpdate productUpdate, ClassificationEntity classification, MaterialEntity material, ColorEntity color, FactoryEntity factory) {
         if (factory == null) {
             throw new CustomException(ErrorCode.ERROR_400, "유효하지 않은 공장 정보");
         }
         this.productName = productUpdate.getProductName();
         this.factory = factory;
         this.classification = classification;
-//        this.productClassification = productUpdate.getModelClassification();
-        this.productMaterial = productUpdate.getGoldType();
-        this.productColor = productUpdate.getGoldColor();
+        this.material = material;
+        this.color = color;
         this.productWeight = productUpdate.getModelWeight();
         this.productNote = productUpdate.getModelNote();
     }

@@ -3,6 +3,7 @@ package com.moblie.management.local.product.controller;
 import com.moblie.management.global.utils.Response;
 import com.moblie.management.local.product.dto.ClassificationDto;
 import com.moblie.management.local.product.service.ClassificationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -33,14 +34,14 @@ public class ClassificationController {
     // 카테고리 삭제
     @DeleteMapping("/classification")
     public ResponseEntity<Response> deletedClassification(
-            @Validated @RequestBody ClassificationDto.ClassificationInfo classificationInfo) {
+            @Valid @RequestBody ClassificationDto.ClassificationInfo classificationInfo) {
         classificationService.deleteClassification(classificationInfo.getClassificationId(), classificationInfo.getClassificationName());
 
         return ResponseEntity.ok(new Response("삭제 완료"));
     }
 
     // 버전 체크 (만약 다르면 앱에서 목록 호출 후 새로 갱신 저장) Local < Server
-    @GetMapping("/version")
+    @GetMapping("/classification/version")
     public ResponseEntity<Integer> getVersion() {
         return ResponseEntity.ok(classificationService.getCurrentVersion());
     }

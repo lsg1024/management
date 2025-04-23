@@ -6,8 +6,12 @@ import com.moblie.management.local.factory.model.FactoryEntity;
 import com.moblie.management.local.factory.repository.FactoryRepository;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
 import com.moblie.management.local.product.model.ClassificationEntity;
+import com.moblie.management.local.product.model.ColorEntity;
+import com.moblie.management.local.product.model.MaterialEntity;
 import com.moblie.management.local.product.model.ProductEntity;
 import com.moblie.management.local.product.repository.ClassificationRepository;
+import com.moblie.management.local.product.repository.ColorRepository;
+import com.moblie.management.local.product.repository.MaterialRepository;
 import com.moblie.management.local.product.repository.ProductRepository;
 import com.moblie.management.local.member.model.MemberEntity;
 import com.moblie.management.local.member.repository.MemberRepository;
@@ -40,6 +44,8 @@ public class ProductService {
     private final FactoryRepository factoryRepository;
     private final MemberRepository memberRepository;
     private final ClassificationRepository classificationRepository;
+    private final MaterialRepository materialRepository;
+    private final ColorRepository colorRepository;
 
     //상품 엑셀 파일 자동호출
     @Transactional
@@ -71,14 +77,22 @@ public class ProductService {
         ProductValidation.validateProductName(productRepository, updateDto.getProductName());
         FactoryEntity factory = factoryRepository.findByFactoryName(updateDto.getFactory());
         ClassificationEntity classification = classificationRepository.findByClassificationName(updateDto.getModelClassification());
+        MaterialEntity material = materialRepository.findByMaterialName(updateDto.getGoldType());
+        ColorEntity color = colorRepository.findByColorName(updateDto.getGoldColor());
 
-        product.productUpdate(updateDto, classification, factory);
+        product.productUpdate(updateDto, classification, material, color, factory);
     }
 
     //상품 조회
     @Cacheable(value = "sLC", key = "'productSearch' + #condition.productName + ':' + #condition.factory + ':' + #condition.modelClassification + ':' + #pageable.pageNumber", cacheManager = "redisCacheManager")
     public PageCustom<ProductDto.productSearchResult> searchProducts(ProductDto.productCondition condition, Pageable pageable) {
         return productRepository.searchProduct(condition, pageable);
+    }
+
+    public ProductDto.productInfo findProductDetail(String barcodeNumber) {
+        ProductEntity product = productRepository.findByProductBarcodeNumber(barcodeNumber);
+
+        return product.getProductDetailInfo();
     }
 
     //상품 삭제
@@ -113,16 +127,18 @@ public class ProductService {
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_409, "유저 정보 오류"));
 
         List<ProductEntity> productEntities = new ArrayList<>();
-        for (ProductDto.createProduct productDto : productsInfo.products) {
+        for (ProductDto.productInfo productDto : productsInfo.products) {
 
             Set<String> error = new HashSet<>();
             validation(productDto, error);
 
             FactoryEntity factory = factoryRepository.findByFactoryName(productDto.getFactory());
             ClassificationEntity classification = classificationRepository.findByClassificationName(productDto.getModelClassification());
+            MaterialEntity material = materialRepository.findByMaterialName(productDto.getGoldType());
+            ColorEntity color = colorRepository.findByColorName(productDto.getGoldColor());
 
             if (error.isEmpty()) {
-                ProductEntity productEntity = ProductEntity.create(productDto, member, classification, factory);
+                ProductEntity productEntity = ProductEntity.create(productDto, member, classification, material, color, factory);
                 productEntities.add(productEntity);
             } else {
                 errorSet.addAll(error);
@@ -135,7 +151,7 @@ public class ProductService {
         errorProduct.addAll(errorSet);
     }
 
-    private void validation(ProductDto.createProduct productDto, Set<String> error) {
+    private void validation(ProductDto.productInfo productDto, Set<String> error) {
         if (productRepository.existsByProductName(productDto.getProductName())) {
             error.add("중복된 상품 이: " + productDto.getProductName());
             return;

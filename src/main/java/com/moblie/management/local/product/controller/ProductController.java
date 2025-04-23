@@ -103,6 +103,13 @@ public class ProductController {
         return productService.searchProducts(condition, pageable);
     }
 
+    @GetMapping("/product/detail")
+    public ResponseEntity<ProductDto.productInfo> productDetail(
+            @RequestParam("unique") String barcodeNumber) {
+        ProductDto.productInfo productDetail = productService.findProductDetail(barcodeNumber);
+        return ResponseEntity.ok(productDetail);
+    }
+
     @DeleteMapping("/product/{productId}")
     public ResponseEntity<Response> deleteProduct(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
