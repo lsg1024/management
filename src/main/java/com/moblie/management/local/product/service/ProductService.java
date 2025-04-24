@@ -153,7 +153,7 @@ public class ProductService {
 
     private void validation(ProductDto.productInfo productDto, Set<String> error) {
         if (productRepository.existsByProductName(productDto.getProductName())) {
-            error.add("중복된 상품 이: " + productDto.getProductName());
+            error.add("중복된 상품 이름: " + productDto.getProductName());
             return;
         }
 

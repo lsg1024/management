@@ -76,7 +76,7 @@ public class ProductDto {
     @Getter @Setter
     @NoArgsConstructor
     public static class productSearchResult {
-        private String modelName;
+        private String productName;
         private String factory;
         private String modelClassification;
         private String goldType;
@@ -85,8 +85,8 @@ public class ProductDto {
         private String modelNote;
 
         @QueryProjection
-        public productSearchResult(String modelName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
-            this.modelName = modelName;
+        public productSearchResult(String productName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
+            this.productName = productName;
             this.factory = factory;
             this.modelClassification = modelClassification;
             this.goldType = goldType;

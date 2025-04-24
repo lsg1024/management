@@ -41,11 +41,11 @@ public class ProductEntity extends BaseEntity {
     private ClassificationEntity classification;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "materialId", nullable = false)
+    @JoinColumn(name = "materialId")
     private MaterialEntity material;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "colorId", nullable = false)
+    @JoinColumn(name = "colorId")
     private ColorEntity color;
 
     @OneToMany(

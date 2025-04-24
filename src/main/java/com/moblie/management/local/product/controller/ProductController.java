@@ -105,7 +105,7 @@ public class ProductController {
 
     @GetMapping("/product/detail")
     public ResponseEntity<ProductDto.productInfo> productDetail(
-            @RequestParam("unique") String barcodeNumber) {
+            @RequestParam("model_number") String barcodeNumber) {
         ProductDto.productInfo productDetail = productService.findProductDetail(barcodeNumber);
         return ResponseEntity.ok(productDetail);
     }

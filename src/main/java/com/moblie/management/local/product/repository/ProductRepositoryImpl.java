@@ -14,6 +14,8 @@ import java.util.List;
 
 import static com.moblie.management.local.factory.model.QFactoryEntity.factoryEntity;
 import static com.moblie.management.local.product.model.QProductEntity.productEntity;
+import static com.moblie.management.local.product.model.QMaterialEntity.materialEntity;
+import static com.moblie.management.local.product.model.QColorEntity.colorEntity;
 import static com.moblie.management.local.product.model.QClassificationEntity.classificationEntity;
 
 public class ProductRepositoryImpl implements ProductRepositoryCustom{
@@ -60,16 +62,19 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
                         productEntity.productName,
                         factoryEntity.factoryName,
                         classificationEntity.classificationName,
-                        productEntity.productMaterial,
-                        productEntity.productColor,
+                        materialEntity.materialName,
+                        colorEntity.colorName,
                         productEntity.productWeight,
                         productEntity.productNote
                 ))
                 .from(productEntity)
                 .join(productEntity.factory, factoryEntity)
                 .join(productEntity.classification, classificationEntity)
-                    .on(classificationEntity.deleted.eq(true)
-                            .or(classificationEntity.deleted.eq(false)))
+                    .on(classificationEntity.deleted.eq(true).or(classificationEntity.deleted.eq(false)))
+                .join(productEntity.material, materialEntity)
+                    .on(materialEntity.deleted.eq(true).or(materialEntity.deleted.eq(false)))
+                .join(productEntity.color, colorEntity)
+                    .on(colorEntity.deleted.eq(true).or(colorEntity.deleted.eq(false)))
                 .where(whereClause)
                 .orderBy(productEntity.productName.asc())
                 .offset(pageable.getOffset())
