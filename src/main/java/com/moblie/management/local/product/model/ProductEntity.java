@@ -82,10 +82,10 @@ public class ProductEntity extends BaseEntity {
                 .build();
     }
 
-    public ProductDto.productInfo getProductDetailInfo() {
-        return new ProductDto.productInfo(
+    public ProductDto.productDetailInfo getProductDetailInfo() {
+        return new ProductDto.productDetailInfo(
+                this.productId.toString(),
                 this.productName,
-                null,
                 this.classification.getClassificationName(),
                 this.material.getMaterialName(),
                 this.color.getColorName(),

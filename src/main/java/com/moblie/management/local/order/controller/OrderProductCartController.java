@@ -28,14 +28,14 @@ public class OrderProductCartController {
 
     //새로운 장바구니 생성 후 장바구니 목록으로 리다이렉트
     @PostMapping("/cart/new")
-    public ResponseEntity<Response> newCart(
+    public ResponseEntity<CartDto.cartResponse> newCart(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestBody @Valid CartDto.create newCart) {
 
         log.info("newCart Controller");
-        orderProductCartService.createNewCart(principalDetails.getId(), newCart.getStoreId());
+        String cartId = orderProductCartService.createNewCart(principalDetails.getId(), newCart.getStoreId());
 
-        return ResponseEntity.ok(new Response("성공"));
+        return ResponseEntity.ok(new CartDto.cartResponse(cartId));
     }
 
     //장바구니에 상품 추가

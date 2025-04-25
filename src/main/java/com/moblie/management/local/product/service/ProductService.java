@@ -89,7 +89,7 @@ public class ProductService {
         return productRepository.searchProduct(condition, pageable);
     }
 
-    public ProductDto.productInfo findProductDetail(String barcodeNumber) {
+    public ProductDto.productDetailInfo findProductDetail(String barcodeNumber) {
         ProductEntity product = productRepository.findByProductBarcodeNumber(barcodeNumber);
 
         return product.getProductDetailInfo();

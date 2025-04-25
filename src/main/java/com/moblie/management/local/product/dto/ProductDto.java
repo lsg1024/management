@@ -96,4 +96,26 @@ public class ProductDto {
         }
     }
 
+    @Getter @Setter
+    @NoArgsConstructor
+    public static class productDetailInfo {
+        private String productId;
+        private String productName;
+        private String modelClassification;
+        private String goldType;
+        private String goldColor;
+        private String modelWeight;
+        private String modelNote;
+
+        public productDetailInfo(String productId, String productName, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
+            this.productId = productId;
+            this.productName = productName;
+            this.modelClassification = modelClassification;
+            this.goldType = goldType;
+            this.goldColor = goldColor;
+            this.modelWeight = modelWeight;
+            this.modelNote = modelNote;
+        }
+    }
+
 }

@@ -62,6 +62,10 @@ public class OrderProductCart extends BaseEntity {
         this.totalProducts = products;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public Store getStore() {
         return this.store;
     }

@@ -61,6 +61,7 @@ public class OrderProductCartRepositoryImpl implements OrderProductCartCustom{
                 .from(orderProductCart)
                 .join(orderProductCart.orderProducts, orderProduct)
                 .join(orderProduct.product, productEntity)
+                .join(productEntity.classification, classificationEntity)
                 .where(orderProductCart.id.eq(Long.parseLong(cartId)))
                 .orderBy(orderProduct.product.productName.asc())
                 .offset(pageable.getOffset())
