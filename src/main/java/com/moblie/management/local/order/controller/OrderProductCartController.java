@@ -39,10 +39,10 @@ public class OrderProductCartController {
     }
 
     //장바구니에 상품 추가
-    @PostMapping("/cart")
+    @PostMapping("/carts/{id}/product")
     public ResponseEntity<Response> addProductToCart(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestParam(name = "id") String cartId,
+            @PathVariable(name = "id") String cartId,
             @RequestParam(name = "product") String productId,
             @Valid @RequestBody CartDto.addProduct product) {
 
@@ -53,20 +53,21 @@ public class OrderProductCartController {
     }
 
     //장바구니 상품 상세 내역을 수정 (ex 수량? 색상)
-    @PatchMapping("/cart")
+    @PatchMapping("/carts/{id}/product/{trackingId}")
     public ResponseEntity<Response> updateCartProduct(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestParam(name = "tracking") String trackingId,
+            @PathVariable(name = "id") String cartId,
+            @PathVariable(name = "trackingId") String trackingId,
             @RequestBody @Valid OrderDto.updateDto productsDto) {
 
         isAccess(principalDetails.getEmail());
-        orderProductCartService.updateProductToCart(trackingId, productsDto);
+        orderProductCartService.updateProductToCart(cartId, trackingId, productsDto);
 
         return ResponseEntity.ok(new Response("성공"));
     }
     
     //장바구니 리스트
-    @GetMapping("/cart")
+    @GetMapping("/carts")
     public PageCustom<CartDto.carts> cartPage(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PageableDefault() Pageable pageable) {

@@ -70,10 +70,13 @@ public class OrderProductCartService {
     }
 
     @Transactional
-    public void updateProductToCart(String trackingId, OrderDto.updateDto updateDto) {
+    public void updateProductToCart(String cartId, String trackingId, OrderDto.updateDto updateDto) {
+
+        orderProductCartRepository.findById(Long.valueOf(cartId))
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "장바구니 없음"));
 
         OrderProduct product = orderProductRepository.findByOrderProductTrackingNumber(trackingId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404));
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "주문 정보를 찾을 수 없음"));
 
         product.updateProductInfo(updateDto);
 
