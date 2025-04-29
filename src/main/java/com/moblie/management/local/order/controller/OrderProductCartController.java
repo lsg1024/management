@@ -65,6 +65,21 @@ public class OrderProductCartController {
 
         return ResponseEntity.ok(new Response("성공"));
     }
+
+    //장바구나 상품 삭제
+
+
+    @DeleteMapping("/carts/{id}/product/{trackingId}")
+    public ResponseEntity<Response> deleteCartProduct(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable(name = "id") String cartId,
+            @PathVariable(name = "trackingId") String trackingId) {
+
+        isAccess(principalDetails.getEmail());
+        orderProductCartService.deleteProductToCart(principalDetails.getId(), cartId, trackingId);
+
+        return ResponseEntity.ok(new Response("성공"));
+    }
     
     //장바구니 리스트
     @GetMapping("/carts")
@@ -83,19 +98,6 @@ public class OrderProductCartController {
             @PageableDefault(size = 20) Pageable pageable) {
 
         return orderProductCartService.getCartProductDetail(principalDetails.getId(), cartTrackingId, pageable);
-    }
-
-    //장바구나 상품 삭제
-    @DeleteMapping("/cart/{cart}")
-    public ResponseEntity<Response> deleteCartProduct(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable(name = "cart") String cartId,
-            @RequestParam(name = "product") String trackingId) {
-        log.info("cartId: {}, product: {}", cartId, trackingId);
-        isAccess(principalDetails.getEmail());
-        orderProductCartService.deleteProductToCart(principalDetails.getId(), cartId, trackingId);
-
-        return ResponseEntity.ok(new Response("성공"));
     }
 
     private void isAccess(String email) {
