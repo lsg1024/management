@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -39,17 +40,29 @@ public class OrderProductCartController {
     }
 
     //장바구니에 상품 추가
-    @PostMapping("/carts/{id}/product")
+    @PostMapping("/carts/{id}/product/{product}")
     public ResponseEntity<Response> addProductToCart(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable(name = "id") String cartId,
-            @RequestParam(name = "product") String productId,
+            @PathVariable(name = "product") String productId,
             @Valid @RequestBody CartDto.addProduct product) {
 
         isAccess(principalDetails.getEmail());
         orderProductCartService.addProductToCart(cartId, productId, product);
 
         return ResponseEntity.ok(new Response("성공"));
+    }
+
+    @GetMapping("/carts/{id}/product/{trackingId}")
+    public ResponseEntity<CartDto.productDetail> getCartProductInfo(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable(name = "id") String cartId,
+            @PathVariable(name = "trackingId") String trackingId) {
+
+        isAccess(principalDetails.getEmail());
+        CartDto.productDetail productDetailToCart = orderProductCartService.getProductDetailToCart(cartId, trackingId);
+
+        return ResponseEntity.ok(productDetailToCart);
     }
 
     //장바구니 상품 상세 내역을 수정 (ex 수량? 색상)
@@ -67,8 +80,6 @@ public class OrderProductCartController {
     }
 
     //장바구나 상품 삭제
-
-
     @DeleteMapping("/carts/{id}/product/{trackingId}")
     public ResponseEntity<Response> deleteCartProduct(
             @AuthenticationPrincipal PrincipalDetails principalDetails,

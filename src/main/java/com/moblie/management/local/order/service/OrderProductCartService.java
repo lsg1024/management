@@ -37,18 +37,18 @@ public class OrderProductCartService {
     public String createNewCart(String userId, String storeId) {
 
         Store store = storeRepository.findById(Long.valueOf(storeId))
-                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404));
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "상점을 찾을 수 없습니다."));
 
         // 오류가 아닌 카트 값을 반환 (기존 값은 데이터가 있겠지, 신규 값은 빈 카트 반환)
-        if (orderProductCartRepository.existsByStoreAndCreatedBy(store, userId)) {
-            return orderProductCartRepository.findByCreatedByAndId(userId, Long.valueOf(storeId))
-                    .orElseThrow().getId().toString();
-        }
+        OrderProductCart cart = orderProductCartRepository
+                .findByStoreAndCreatedBy(store, userId)
+                .orElseGet(() ->
+                        orderProductCartRepository.save(
+                                OrderProductCart.create(store)
+                        )
+                );
 
-        OrderProductCart orderProductCart = OrderProductCart.create(store);
-        orderProductCartRepository.save(orderProductCart);
-
-        return orderProductCart.getId().toString();
+        return cart.getId().toString();
     }
 
     @Transactional
@@ -67,6 +67,10 @@ public class OrderProductCartService {
         } catch (Exception e) {
             throw new CustomException(ErrorCode.ERROR_400, e.getMessage());
         }
+    }
+
+    public CartDto.productDetail getProductDetailToCart(String cartId, String trackingId) {
+        return orderProductCartRepository.findCartToTackingProductInfo(Long.parseLong(cartId), trackingId);
     }
 
     @Transactional
@@ -88,7 +92,7 @@ public class OrderProductCartService {
     }
 
     public PageCustom<CartDto.productDetail> getCartProductDetail(String id, String cartTrackingId, Pageable pageable) {
-        return orderProductCartRepository.findCartProductDetail(id, cartTrackingId, pageable);
+        return orderProductCartRepository.findCartProductDetailList(id, cartTrackingId, pageable);
     }
 
     @DefaultRock(key = "'cart:' + #trackingId")

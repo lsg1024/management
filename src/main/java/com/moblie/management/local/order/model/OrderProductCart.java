@@ -18,6 +18,12 @@ import static jakarta.persistence.CascadeType.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        name = "order_product_cart",
+        uniqueConstraints = @UniqueConstraint(
+        name = "uk_cart_store_user",
+        columnNames = {"store_id", "created_by"}
+))
 public class OrderProductCart extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +31,8 @@ public class OrderProductCart extends BaseEntity {
     private Long id;
     private int totalProducts;
 
-    @OneToOne(cascade = {PERSIST, REMOVE})
-    @JoinColumn(name = "store_id")
+    @ManyToOne(cascade = {PERSIST, REMOVE})
+    @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
     @OneToMany(

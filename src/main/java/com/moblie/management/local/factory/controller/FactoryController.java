@@ -9,9 +9,11 @@ import com.moblie.management.local.factory.dto.FactoryDto;
 import com.moblie.management.local.factory.service.FactoryService;
 import com.moblie.management.local.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,8 @@ public class FactoryController {
             @RequestParam MultipartFile file) throws IOException {
 
         List<String> errors = factoryService.createAutoFactory(file);
+
+        log.info("errors {}", errors.iterator());
 
         return getResponse(errors);
     }
@@ -72,11 +76,7 @@ public class FactoryController {
             @RequestBody FactoryDto.factory updateFactory) {
 
         isAccess(principalDetails.getEmail());
-        List<String> error = factoryService.updateFactory(factoryId, updateFactory);
-
-        if (!error.isEmpty()) {
-            return ResponseEntity.status(404).body(new Response("수정 실패", error));
-        }
+        factoryService.updateFactory(factoryId, updateFactory);
 
         return ResponseEntity.ok(new Response("수정 완료"));
     }
@@ -101,7 +101,7 @@ public class FactoryController {
 
     private ResponseEntity<Response> getResponse(List<String> errors) {
         if (!errors.isEmpty()) {
-            return ResponseEntity.ok(new Response("저장 실패 목록", errors));
+            return ResponseEntity.badRequest().body(new Response(HttpStatus.BAD_REQUEST, "저장 실패 목록", errors));
         }
 
         return ResponseEntity.ok(new Response("저장완료"));

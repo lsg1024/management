@@ -44,7 +44,7 @@ public class OrderProductCartRepositoryImpl implements OrderProductCartCustom{
     }
 
     @Override
-    public PageCustom<CartDto.productDetail> findCartProductDetail(String userId, String cartId, Pageable pageable) {
+    public PageCustom<CartDto.productDetail> findCartProductDetailList(String userId, String cartId, Pageable pageable) {
         List<CartDto.productDetail> content = query
                 .select(new QCartDto_productDetail(
                         orderProduct.orderProductTrackingNumber,
@@ -73,6 +73,32 @@ public class OrderProductCartRepositoryImpl implements OrderProductCartCustom{
                 .from(orderProduct);
 
         return new PageCustom<>(content, pageable, countQuery.fetchOne());
+    }
+
+    @Override
+    public CartDto.productDetail findCartToTackingProductInfo(Long cartId, String trackingId) {
+
+        return query
+                .select(new QCartDto_productDetail(
+                        orderProduct.orderProductTrackingNumber,
+                        productEntity.productName,
+                        classificationEntity.classificationName,
+                        orderProduct.productGoldType,
+                        orderProduct.productOrderColor,
+                        productEntity.productWeight,
+                        orderProduct.productOrderRequestNote,
+                        orderProduct.amount,
+                        productEntity.factory.factoryName
+                ))
+                .from(orderProductCart)
+                .join(orderProductCart.orderProducts, orderProduct)
+                .join(orderProduct.product, productEntity)
+                .join(productEntity.classification, classificationEntity)
+                .where(
+                        orderProductCart.id.eq(cartId),
+                        orderProduct.orderProductTrackingNumber.eq(trackingId))
+                .fetchOne();
+
     }
 
 
