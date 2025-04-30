@@ -1,15 +1,16 @@
 package com.moblie.management.global.config.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moblie.management.global.exception.ErrorResponse;
+import com.moblie.management.global.utils.Response;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
@@ -18,10 +19,10 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException)
             throws IOException {
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpServletResponse.SC_FORBIDDEN,
+        Response errorResponse = new Response(
+                HttpStatus.PROXY_AUTHENTICATION_REQUIRED,
                 "접근 권한이 없습니다.",
-                Map.of("path", request.getRequestURI())
+                List.of("path", request.getRequestURI())
         );
 
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
