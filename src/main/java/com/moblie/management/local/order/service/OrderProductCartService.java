@@ -34,18 +34,21 @@ public class OrderProductCartService {
     private final OrderProductCartRepository orderProductCartRepository;
 
     @Transactional
-    public void createNewCart(String userId, String storeId) {
+    public String createNewCart(String userId, String storeId) {
 
         Store store = storeRepository.findById(Long.valueOf(storeId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404));
 
         // 오류가 아닌 카트 값을 반환 (기존 값은 데이터가 있겠지, 신규 값은 빈 카트 반환)
         if (orderProductCartRepository.existsByStoreAndCreatedBy(store, userId)) {
-            throw new CustomException(ErrorCode.ERROR_409);
+            return orderProductCartRepository.findByCreatedByAndId(userId, Long.valueOf(storeId))
+                    .orElseThrow().getId().toString();
         }
 
         OrderProductCart orderProductCart = OrderProductCart.create(store);
         orderProductCartRepository.save(orderProductCart);
+
+        return orderProductCart.getId().toString();
     }
 
     @Transactional

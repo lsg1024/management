@@ -4,10 +4,10 @@ import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
 import com.moblie.management.global.utils.PageCustom;
+import com.moblie.management.global.utils.Response;
 import com.moblie.management.local.member.service.MemberService;
 import com.moblie.management.local.order.dto.CartDto;
 import com.moblie.management.local.order.dto.OrderDto;
-import com.moblie.management.local.order.dto.OrderResponse;
 import com.moblie.management.local.order.service.OrderProductCartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,19 +28,19 @@ public class OrderProductCartController {
 
     //새로운 장바구니 생성 후 장바구니 목록으로 리다이렉트
     @PostMapping("/cart/new")
-    public ResponseEntity<?> newCart(
+    public ResponseEntity<CartDto.cartResponse> newCart(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestBody @Valid CartDto.create newCart) {
 
         log.info("newCart Controller");
-        orderProductCartService.createNewCart(principalDetails.getId(), newCart.getStoreId());
+        String cartId = orderProductCartService.createNewCart(principalDetails.getId(), newCart.getStoreId());
 
-        return ResponseEntity.ok(new OrderResponse("성공"));
+        return ResponseEntity.ok(new CartDto.cartResponse(cartId));
     }
 
     //장바구니에 상품 추가
     @PostMapping("/cart")
-    public ResponseEntity<?> addProductToCart(
+    public ResponseEntity<Response> addProductToCart(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam(name = "id") String cartId,
             @RequestParam(name = "product") String productId,
@@ -49,12 +49,12 @@ public class OrderProductCartController {
         isAccess(principalDetails.getEmail());
         orderProductCartService.addProductToCart(cartId, productId, product);
 
-        return ResponseEntity.ok(new OrderResponse("성공"));
+        return ResponseEntity.ok(new Response("성공"));
     }
 
     //장바구니 상품 상세 내역을 수정 (ex 수량? 색상)
     @PatchMapping("/cart")
-    public ResponseEntity<?> updateCartProduct(
+    public ResponseEntity<Response> updateCartProduct(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam(name = "tracking") String trackingId,
             @RequestBody @Valid OrderDto.updateDto productsDto) {
@@ -62,7 +62,7 @@ public class OrderProductCartController {
         isAccess(principalDetails.getEmail());
         orderProductCartService.updateProductToCart(trackingId, productsDto);
 
-        return ResponseEntity.ok(new OrderResponse("성공"));
+        return ResponseEntity.ok(new Response("성공"));
     }
     
     //장바구니 리스트
@@ -86,7 +86,7 @@ public class OrderProductCartController {
 
     //장바구나 상품 삭제
     @DeleteMapping("/cart/{cart}")
-    public ResponseEntity<?> deleteCartProduct(
+    public ResponseEntity<Response> deleteCartProduct(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable(name = "cart") String cartId,
             @RequestParam(name = "product") String trackingId) {
@@ -94,7 +94,7 @@ public class OrderProductCartController {
         isAccess(principalDetails.getEmail());
         orderProductCartService.deleteProductToCart(principalDetails.getId(), cartId, trackingId);
 
-        return ResponseEntity.ok(new OrderResponse("성공"));
+        return ResponseEntity.ok(new Response("성공"));
     }
 
     private void isAccess(String email) {

@@ -2,8 +2,8 @@ package com.moblie.management.global.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moblie.management.global.jwt.JwtUtil;
-import com.moblie.management.local.member.dto.Response;
 import com.moblie.management.global.redis.service.RedisRefreshTokenService;
+import com.moblie.management.global.utils.Response;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

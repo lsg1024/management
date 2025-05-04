@@ -21,7 +21,7 @@ public class ProductUtil {
                     .map(index -> extractedExcelCellData(row, index))
                     .toList();
 
-            ProductDto.createProduct product = new ProductDto.createProduct(
+            ProductDto.productInfo product = new ProductDto.productInfo(
                     columValues.get(0), // modelNumber
                     columValues.get(1).toUpperCase(), // factory
                     columValues.get(2), // modelClassification

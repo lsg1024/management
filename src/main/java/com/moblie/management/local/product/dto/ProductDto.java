@@ -16,7 +16,7 @@ public class ProductDto {
 
     @Getter @Setter
     @NoArgsConstructor
-    public static class createProduct {
+    public static class productInfo {
 
         @NotEmpty(message = "제품 이름을 입력해주세요.")
         private String productName;
@@ -28,7 +28,7 @@ public class ProductDto {
         private String modelNote;
         private String modelBarcode;
 
-        public createProduct(String productName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
+        public productInfo(String productName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
             this.productName = productName;
             this.factory = factory;
             this.modelClassification = modelClassification;
@@ -41,7 +41,7 @@ public class ProductDto {
 
     public static class productsInfo {
         @Valid @NotNull
-        public List<createProduct> products;
+        public List<productInfo> products;
     }
 
     @Getter
@@ -76,7 +76,7 @@ public class ProductDto {
     @Getter @Setter
     @NoArgsConstructor
     public static class productSearchResult {
-        private String modelName;
+        private String productName;
         private String factory;
         private String modelClassification;
         private String goldType;
@@ -85,9 +85,31 @@ public class ProductDto {
         private String modelNote;
 
         @QueryProjection
-        public productSearchResult(String modelName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
-            this.modelName = modelName;
+        public productSearchResult(String productName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
+            this.productName = productName;
             this.factory = factory;
+            this.modelClassification = modelClassification;
+            this.goldType = goldType;
+            this.goldColor = goldColor;
+            this.modelWeight = modelWeight;
+            this.modelNote = modelNote;
+        }
+    }
+
+    @Getter @Setter
+    @NoArgsConstructor
+    public static class productDetailInfo {
+        private String productId;
+        private String productName;
+        private String modelClassification;
+        private String goldType;
+        private String goldColor;
+        private String modelWeight;
+        private String modelNote;
+
+        public productDetailInfo(String productId, String productName, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
+            this.productId = productId;
+            this.productName = productName;
             this.modelClassification = modelClassification;
             this.goldType = goldType;
             this.goldColor = goldColor;

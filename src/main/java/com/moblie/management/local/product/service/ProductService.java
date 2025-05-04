@@ -5,7 +5,13 @@ import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.local.factory.model.FactoryEntity;
 import com.moblie.management.local.factory.repository.FactoryRepository;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
+import com.moblie.management.local.product.model.ClassificationEntity;
+import com.moblie.management.local.product.model.ColorEntity;
+import com.moblie.management.local.product.model.MaterialEntity;
 import com.moblie.management.local.product.model.ProductEntity;
+import com.moblie.management.local.product.repository.ClassificationRepository;
+import com.moblie.management.local.product.repository.ColorRepository;
+import com.moblie.management.local.product.repository.MaterialRepository;
 import com.moblie.management.local.product.repository.ProductRepository;
 import com.moblie.management.local.member.model.MemberEntity;
 import com.moblie.management.local.member.repository.MemberRepository;
@@ -27,7 +33,6 @@ import java.util.*;
 
 import static com.moblie.management.global.utils.ExcelSheetUtil.*;
 import static com.moblie.management.local.product.util.ProductUtil.formatProductExcelData;
-import static com.moblie.management.local.product.validation.ProductValidation.*;
 
 @Slf4j
 @Service
@@ -38,6 +43,9 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final FactoryRepository factoryRepository;
     private final MemberRepository memberRepository;
+    private final ClassificationRepository classificationRepository;
+    private final MaterialRepository materialRepository;
+    private final ColorRepository colorRepository;
 
     //상품 엑셀 파일 자동호출
     @Transactional
@@ -55,7 +63,7 @@ public class ProductService {
     
     //상품 수동 입력
     @Transactional
-    public List<String> createManualProduct(PrincipalDetails principalDetails, ProductDto.productsInfo productsInfo) throws IOException {
+    public List<String> createManualProduct(PrincipalDetails principalDetails, ProductDto.productsInfo productsInfo) {
         return createManualProductProcess(productsInfo, principalDetails.getId());
     }
 
@@ -68,8 +76,11 @@ public class ProductService {
 
         ProductValidation.validateProductName(productRepository, updateDto.getProductName());
         FactoryEntity factory = factoryRepository.findByFactoryName(updateDto.getFactory());
+        ClassificationEntity classification = classificationRepository.findByClassificationName(updateDto.getModelClassification());
+        MaterialEntity material = materialRepository.findByMaterialName(updateDto.getGoldType());
+        ColorEntity color = colorRepository.findByColorName(updateDto.getGoldColor());
 
-        product.productUpdate(updateDto, factory);
+        product.productUpdate(updateDto, classification, material, color, factory);
     }
 
     //상품 조회
@@ -78,16 +89,22 @@ public class ProductService {
         return productRepository.searchProduct(condition, pageable);
     }
 
+    public ProductDto.productDetailInfo findProductDetail(String barcodeNumber) {
+        ProductEntity product = productRepository.findByProductBarcodeNumber(barcodeNumber);
+
+        return product.getProductDetailInfo();
+    }
+
     //상품 삭제
     @Transactional
     public void deletedProduct(String productId) {
         ProductEntity product = productRepository.findById(Long.valueOf(productId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "상품 삭제를 실패하였습니다"));
         product.validateProductAccess(productId);
-        product.delete();
+        productRepository.delete(product);
     }
 
-    private List<String> createAutoProductProcess(ProductDto.productsInfo productsInfo, String memberId) throws IOException {
+    private List<String> createAutoProductProcess(ProductDto.productsInfo productsInfo, String memberId)  {
         List<String> errors = new ArrayList<>();
 
         extractedProductInfo(productsInfo, memberId, errors);
@@ -95,7 +112,7 @@ public class ProductService {
         return errors;
     }
 
-    private List<String> createManualProductProcess(ProductDto.productsInfo productsInfo, String memberId) throws IOException {
+    private List<String> createManualProductProcess(ProductDto.productsInfo productsInfo, String memberId){
         List<String> errors = new ArrayList<>();
 
         extractedProductInfo(productsInfo, memberId, errors);
@@ -103,22 +120,25 @@ public class ProductService {
         return errors;
     }
 
-    private void extractedProductInfo(ProductDto.productsInfo productsInfo, String memberId, List<String> errorProduct) throws IOException {
+    private void extractedProductInfo(ProductDto.productsInfo productsInfo, String memberId, List<String> errorProduct)  {
         Set<String> errorSet = new HashSet<>();
 
         MemberEntity member = memberRepository.findById(Long.valueOf(memberId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_409, "유저 정보 오류"));
 
         List<ProductEntity> productEntities = new ArrayList<>();
-        for (ProductDto.createProduct productDto : productsInfo.products) {
+        for (ProductDto.productInfo productDto : productsInfo.products) {
 
             Set<String> error = new HashSet<>();
-            validateProductDto(productRepository, factoryRepository, productDto, error);
+            validation(productDto, error);
 
             FactoryEntity factory = factoryRepository.findByFactoryName(productDto.getFactory());
+            ClassificationEntity classification = classificationRepository.findByClassificationName(productDto.getModelClassification());
+            MaterialEntity material = materialRepository.findByMaterialName(productDto.getGoldType());
+            ColorEntity color = colorRepository.findByColorName(productDto.getGoldColor());
 
             if (error.isEmpty()) {
-                ProductEntity productEntity = ProductEntity.create(productDto, member, factory);
+                ProductEntity productEntity = ProductEntity.create(productDto, member, classification, material, color, factory);
                 productEntities.add(productEntity);
             } else {
                 errorSet.addAll(error);
@@ -129,6 +149,23 @@ public class ProductService {
         }
 
         errorProduct.addAll(errorSet);
+    }
+
+    private void validation(ProductDto.productInfo productDto, Set<String> error) {
+        if (productRepository.existsByProductName(productDto.getProductName())) {
+            error.add("중복된 상품 이름: " + productDto.getProductName());
+            return;
+        }
+
+        if (!factoryRepository.existsByFactoryName(productDto.getFactory())) {
+            error.add("존재하지 않은 공장: " + productDto.getFactory());
+            return;
+        }
+
+        if (!classificationRepository.existsByClassificationName(productDto.getModelClassification())) {
+            error.add("존재하지 않는 카테고리: " + productDto.getModelClassification());
+        }
+
     }
 
 }

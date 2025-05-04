@@ -1,8 +1,8 @@
 package com.moblie.management.local.member.controller;
 
+import com.moblie.management.global.utils.Response;
 import com.moblie.management.local.member.service.MemberService;
 import com.moblie.management.local.member.dto.MemberDto;
-import com.moblie.management.local.member.dto.Response;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -2,6 +2,7 @@ package com.moblie.management.local.order.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,13 @@ public class CartDto {
     public static class create {
         @NotBlank(message = "추가하실 장바구니를 선택해주세요.")
         private String storeId;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class cartResponse {
+        private String cartId;
     }
 
     @Getter

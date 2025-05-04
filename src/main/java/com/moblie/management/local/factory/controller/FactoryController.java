@@ -4,10 +4,9 @@ import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
 import com.moblie.management.global.utils.PageCustom;
+import com.moblie.management.global.utils.Response;
 import com.moblie.management.local.factory.dto.FactoryDto;
-import com.moblie.management.local.factory.dto.FactoryResponse;
 import com.moblie.management.local.factory.service.FactoryService;
-import com.moblie.management.local.member.dto.Response;
 import com.moblie.management.local.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,7 @@ public class FactoryController {
     private final FactoryService factoryService;
 
     @PostMapping("/factories/new")
-    public ResponseEntity<FactoryResponse> createExcelFactory(
+    public ResponseEntity<Response> createExcelFactory(
             @RequestParam MultipartFile file) throws IOException {
 
         List<String> errors = factoryService.createAutoFactory(file);
@@ -39,7 +38,7 @@ public class FactoryController {
     }
 
     @PostMapping("/factory/new")
-    public ResponseEntity<FactoryResponse> createManualProduct(
+    public ResponseEntity<Response> createManualProduct(
             @RequestBody FactoryDto.factoryInfo factories) {
 
         List<String> errors = factoryService.createManualFactory(factories);
@@ -67,7 +66,7 @@ public class FactoryController {
     }
 
     @PatchMapping("/factory/{factory_id}")
-    public ResponseEntity<FactoryResponse> updateFactory(
+    public ResponseEntity<Response> updateFactory(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable(name = "factory_id") String factoryId,
             @RequestBody FactoryDto.factory updateFactory) {
@@ -76,21 +75,21 @@ public class FactoryController {
         List<String> error = factoryService.updateFactory(factoryId, updateFactory);
 
         if (!error.isEmpty()) {
-            return ResponseEntity.status(404).body(new FactoryResponse("수정 실패", error));
+            return ResponseEntity.status(404).body(new Response("수정 실패", error));
         }
 
-        return ResponseEntity.ok(new FactoryResponse("수정 완료"));
+        return ResponseEntity.ok(new Response("수정 완료"));
     }
 
     @DeleteMapping("/factory/{factory_id}")
-    public ResponseEntity<FactoryResponse> deleteFactory(
+    public ResponseEntity<Response> deleteFactory(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable(name = "factory_id") String factoryId) {
 
         isAccess(principalDetails.getEmail());
         factoryService.deleteFactory(factoryId);
 
-        return ResponseEntity.ok(new FactoryResponse("삭제 완료"));
+        return ResponseEntity.ok(new Response("삭제 완료"));
 
     }
 
@@ -100,12 +99,12 @@ public class FactoryController {
         }
     }
 
-    private ResponseEntity<FactoryResponse> getResponse(List<String> errors) {
+    private ResponseEntity<Response> getResponse(List<String> errors) {
         if (!errors.isEmpty()) {
-            return ResponseEntity.ok(new FactoryResponse("저장 실패 목록", errors));
+            return ResponseEntity.ok(new Response("저장 실패 목록", errors));
         }
 
-        return ResponseEntity.ok(new FactoryResponse("저장완료"));
+        return ResponseEntity.ok(new Response("저장완료"));
     }
 
 }

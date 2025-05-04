@@ -14,7 +14,9 @@ import java.util.List;
 
 import static com.moblie.management.local.factory.model.QFactoryEntity.factoryEntity;
 import static com.moblie.management.local.product.model.QProductEntity.productEntity;
-
+import static com.moblie.management.local.product.model.QMaterialEntity.materialEntity;
+import static com.moblie.management.local.product.model.QColorEntity.colorEntity;
+import static com.moblie.management.local.product.model.QClassificationEntity.classificationEntity;
 
 public class ProductRepositoryImpl implements ProductRepositoryCustom{
 
@@ -52,21 +54,27 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
             whereClause.and(factoryEntity.factoryName.eq(condition.getFactory()));
         }
         if (StringUtils.hasText(condition.getModelClassification())) {
-            whereClause.and(productEntity.productClassification.eq(condition.getModelClassification()));
+            whereClause.and(classificationEntity.classificationName.eq(condition.getModelClassification()));
         }
 
         List<ProductDto.productSearchResult> content = query
                 .select(Projections.constructor(ProductDto.productSearchResult.class,
                         productEntity.productName,
                         factoryEntity.factoryName,
-                        productEntity.productClassification,
-                        productEntity.productMaterial,
-                        productEntity.productColor,
+                        classificationEntity.classificationName,
+                        materialEntity.materialName,
+                        colorEntity.colorName,
                         productEntity.productWeight,
                         productEntity.productNote
                 ))
                 .from(productEntity)
                 .join(productEntity.factory, factoryEntity)
+                .join(productEntity.classification, classificationEntity)
+                    .on(classificationEntity.deleted.eq(true).or(classificationEntity.deleted.eq(false)))
+                .join(productEntity.material, materialEntity)
+                    .on(materialEntity.deleted.eq(true).or(materialEntity.deleted.eq(false)))
+                .join(productEntity.color, colorEntity)
+                    .on(colorEntity.deleted.eq(true).or(colorEntity.deleted.eq(false)))
                 .where(whereClause)
                 .orderBy(productEntity.productName.asc())
                 .offset(pageable.getOffset())
@@ -77,6 +85,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
                 .select(productEntity.count())
                 .from(productEntity)
                 .leftJoin(productEntity.factory, factoryEntity)
+                .leftJoin(productEntity.classification, classificationEntity)
+                    .on(classificationEntity.deleted.eq(true)
+                            .or(classificationEntity.deleted.eq(false)))
                 .where(whereClause);
 
         // PageCustom 객체로 변환하여 반환

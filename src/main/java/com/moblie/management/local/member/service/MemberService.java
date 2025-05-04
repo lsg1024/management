@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.Optional;
 import java.util.Random;
@@ -172,7 +173,7 @@ public class MemberService {
         try {
             jwtUtil.isExpired(refresh);
         } catch (ExpiredJwtException e) {
-            throw new CustomException(ErrorCode.ERROR_401, "Refresh 토큰 만료");
+            throw new CustomException(ErrorCode.ERROR_407, "토큰 만료");
         }
 
         String category = jwtUtil.getCategory(refresh);

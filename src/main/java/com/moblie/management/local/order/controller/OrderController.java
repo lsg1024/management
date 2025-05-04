@@ -3,8 +3,8 @@ package com.moblie.management.local.order.controller;
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
 import com.moblie.management.global.jwt.dto.PrincipalDetails;
+import com.moblie.management.global.utils.Response;
 import com.moblie.management.local.member.service.MemberService;
-import com.moblie.management.local.order.dto.OrderResponse;
 import com.moblie.management.local.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,18 +23,18 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/product/order")
-    public ResponseEntity<?> newOrder(
+    public ResponseEntity<Response> newOrder(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam(name = "cart") String cartId) {
 
         isAccess(principalDetails.getEmail());
         orderService.createOrder(principalDetails.getId(), cartId);
 
-        return ResponseEntity.ok(new OrderResponse("주문 완료"));
+        return ResponseEntity.ok(new Response("주문 완료"));
     }
 
     @PostMapping("/order/approve")
-    public ResponseEntity<OrderResponse> approveOrder(
+    public ResponseEntity<Response> approveOrder(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam(name = "order") String trackingId) {
         isAccess(principalDetails.getEmail());
@@ -42,7 +42,7 @@ public class OrderController {
         log.info("trackingId {}", trackingId);
         orderService.orderApproval(trackingId);
 
-        return ResponseEntity.ok(new OrderResponse("승인 완료"));
+        return ResponseEntity.ok(new Response("승인 완료"));
     }
 
     private void isAccess(String email) {

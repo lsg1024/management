@@ -9,5 +9,8 @@ import java.util.Optional;
 public interface OrderProductCartRepository extends JpaRepository<OrderProductCart, Long>, OrderProductCartCustom {
     Optional<OrderProductCart> findByCreatedBy(String userId);
     Optional<OrderProductCart> findByCreatedByAndId(String userId, Long cartId);
+
     boolean existsByStoreAndCreatedBy(Store store, String userId);
+
+
 }

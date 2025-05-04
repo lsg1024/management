@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long>, ProductRepositoryCustom {
     ProductEntity findByProductName(String productName);
+
+    ProductEntity findByProductBarcodeNumber(String barcodeNumber);
     boolean existsByProductName(String productName);
     boolean existsByProductBarcodeNumber(String barcodeNumber);
 }
