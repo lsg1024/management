@@ -75,7 +75,7 @@ public class FactoryService {
     }
 
     //페이지 조회
-    @Cacheable(value = "factorySearch", key = "#condition.factoryName", cacheManager = "redisCacheManager")
+    @Cacheable(value = "factorySearch", key = "#condition.factoryName + #pageable.pageNumber", cacheManager = "redisCacheManager")
     public PageCustom<FactoryDto.factoriesResponse> searchFactories(FactoryDto.factoryCondition condition, Pageable pageable) {
         return factoryRepository.searchFactories(condition, pageable);
     }
@@ -87,19 +87,14 @@ public class FactoryService {
 
     //수정
     @DefaultRock(key = "#factoryId")
-    public List<String> updateFactory(String factoryId, FactoryDto.factory updateDto) {
+    public void updateFactory(String factoryId, FactoryDto.factory updateDto) {
         FactoryEntity factory = factoryRepository.findById(Long.parseLong(factoryId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404));
 
-        List<String> errors = new ArrayList<>();
-
         if (factoryRepository.existsByFactoryName(updateDto.getFactoryName())) {
-            errors.add(updateDto.getFactoryName());
-        } else {
-            factory.factoryUpdate(updateDto);
+            throw new CustomException(ErrorCode.ERROR_400, "동일한 공장 존재");
         }
-
-        return errors;
+        factory.factoryUpdate(updateDto);
     }
 
     //삭제

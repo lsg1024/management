@@ -22,7 +22,7 @@ public class OrderController {
     private final MemberService memberService;
     private final OrderService orderService;
 
-    @PostMapping("/product/order")
+    @PostMapping("/order")
     public ResponseEntity<Response> newOrder(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam(name = "cart") String cartId) {
