@@ -75,7 +75,7 @@ public class FactoryService {
     }
 
     //페이지 조회
-    @Cacheable(value = "factorySearch", key = "#condition.factoryName", cacheManager = "redisCacheManager")
+    @Cacheable(value = "factorySearch", key = "#condition.factoryName + #pageable.pageNumber", cacheManager = "redisCacheManager")
     public PageCustom<FactoryDto.factoriesResponse> searchFactories(FactoryDto.factoryCondition condition, Pageable pageable) {
         return factoryRepository.searchFactories(condition, pageable);
     }

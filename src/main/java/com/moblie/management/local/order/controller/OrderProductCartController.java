@@ -60,7 +60,7 @@ public class OrderProductCartController {
             @PathVariable(name = "trackingId") String trackingId) {
 
         isAccess(principalDetails.getEmail());
-        CartDto.productDetail productDetailToCart = orderProductCartService.getProductDetailToCart(cartId, trackingId);
+        CartDto.productDetail productDetailToCart = orderProductCartService.getProductDetailToCart(principalDetails.getId(), cartId, trackingId);
 
         return ResponseEntity.ok(productDetailToCart);
     }

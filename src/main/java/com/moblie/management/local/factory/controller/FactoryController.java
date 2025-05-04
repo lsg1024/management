@@ -53,7 +53,7 @@ public class FactoryController {
     @GetMapping("/factory")
     public PageCustom<FactoryDto.factoriesResponse> searchFactory(
             @RequestParam("factory_name") String factoryName,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 16) Pageable pageable) {
 
         FactoryDto.factoryCondition condition = new FactoryDto.factoryCondition(factoryName);
 

@@ -48,7 +48,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
 
         BooleanBuilder whereClause = new BooleanBuilder();
         if (StringUtils.hasText(condition.getProductName())) {
-            whereClause.and(productEntity.productName.eq(condition.getProductName()));
+            whereClause.and(productEntity.productName.containsIgnoreCase(condition.getProductName()));
         }
         if (StringUtils.hasText(condition.getFactory())) {
             whereClause.and(factoryEntity.factoryName.eq(condition.getFactory()));

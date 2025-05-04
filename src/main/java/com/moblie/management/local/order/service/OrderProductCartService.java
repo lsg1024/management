@@ -69,8 +69,8 @@ public class OrderProductCartService {
         }
     }
 
-    public CartDto.productDetail getProductDetailToCart(String cartId, String trackingId) {
-        return orderProductCartRepository.findCartToTackingProductInfo(Long.parseLong(cartId), trackingId);
+    public CartDto.productDetail getProductDetailToCart(String userId, String cartId, String trackingId) {
+        return orderProductCartRepository.findCartToTackingProductInfo(userId, Long.parseLong(cartId), trackingId);
     }
 
     @Transactional

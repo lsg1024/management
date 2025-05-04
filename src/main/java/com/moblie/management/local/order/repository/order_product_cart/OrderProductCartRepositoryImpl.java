@@ -31,6 +31,7 @@ public class OrderProductCartRepositoryImpl implements OrderProductCartCustom{
                 ))
                 .from(orderProductCart)
                 .join(orderProductCart.store, store)
+                .where(orderProductCart.createdBy.eq(userId))
                 .orderBy(orderProductCart.lastModifiedDate.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -63,6 +64,7 @@ public class OrderProductCartRepositoryImpl implements OrderProductCartCustom{
                 .join(orderProduct.product, productEntity)
                 .join(productEntity.classification, classificationEntity)
                 .where(orderProductCart.id.eq(Long.parseLong(cartId)))
+                .where(orderProductCart.createdBy.eq(userId))
                 .orderBy(orderProduct.product.productName.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -76,7 +78,7 @@ public class OrderProductCartRepositoryImpl implements OrderProductCartCustom{
     }
 
     @Override
-    public CartDto.productDetail findCartToTackingProductInfo(Long cartId, String trackingId) {
+    public CartDto.productDetail findCartToTackingProductInfo(String userId, Long cartId, String trackingId) {
 
         return query
                 .select(new QCartDto_productDetail(
@@ -95,6 +97,7 @@ public class OrderProductCartRepositoryImpl implements OrderProductCartCustom{
                 .join(orderProduct.product, productEntity)
                 .join(productEntity.classification, classificationEntity)
                 .where(
+                        orderProductCart.createdBy.eq(userId),
                         orderProductCart.id.eq(cartId),
                         orderProduct.orderProductTrackingNumber.eq(trackingId))
                 .fetchOne();

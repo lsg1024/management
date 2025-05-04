@@ -7,5 +7,5 @@ import org.springframework.data.domain.Pageable;
 public interface OrderProductCartCustom {
     PageCustom<CartDto.carts> findCartAll(String userId, Pageable pageable);
     PageCustom<CartDto.productDetail> findCartProductDetailList(String userId, String cartId, Pageable pageable);
-    CartDto.productDetail findCartToTackingProductInfo(Long cartId, String trackingId);
+    CartDto.productDetail findCartToTackingProductInfo(String userId, Long cartId, String trackingId);
 }
