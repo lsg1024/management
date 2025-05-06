@@ -75,7 +75,8 @@ public class ProductDto {
 
     @Getter @Setter
     @NoArgsConstructor
-    public static class productSearchResult {
+    public static class productDetailInfo {
+        private String productId;
         private String productName;
         private String factory;
         private String modelClassification;
@@ -85,31 +86,10 @@ public class ProductDto {
         private String modelNote;
 
         @QueryProjection
-        public productSearchResult(String productName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
-            this.productName = productName;
-            this.factory = factory;
-            this.modelClassification = modelClassification;
-            this.goldType = goldType;
-            this.goldColor = goldColor;
-            this.modelWeight = modelWeight;
-            this.modelNote = modelNote;
-        }
-    }
-
-    @Getter @Setter
-    @NoArgsConstructor
-    public static class productDetailInfo {
-        private String productId;
-        private String productName;
-        private String modelClassification;
-        private String goldType;
-        private String goldColor;
-        private String modelWeight;
-        private String modelNote;
-
-        public productDetailInfo(String productId, String productName, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
+        public productDetailInfo(String productId, String productName, String factory, String modelClassification, String goldType, String goldColor, String modelWeight, String modelNote) {
             this.productId = productId;
             this.productName = productName;
+            this.factory = factory;
             this.modelClassification = modelClassification;
             this.goldType = goldType;
             this.goldColor = goldColor;

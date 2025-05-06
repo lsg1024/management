@@ -7,7 +7,6 @@ import com.moblie.management.global.jwt.dto.PrincipalDetails;
 import com.moblie.management.global.utils.Response;
 import com.moblie.management.local.member.service.MemberService;
 import com.moblie.management.local.product.dto.ProductDto;
-import com.moblie.management.global.utils.Response;
 import com.moblie.management.local.product.service.ProductImageService;
 import com.moblie.management.local.product.service.ProductService;
 import jakarta.validation.Valid;
@@ -88,7 +87,7 @@ public class ProductController {
     }
 
     @GetMapping("/product/search")
-    public Page<ProductDto.productSearchResult> searchProduct(
+    public Page<ProductDto.productDetailInfo> searchProduct(
             @RequestParam("product") String productName,
             @RequestParam("factory") String factoryName,
             @RequestParam("classification") String classification,
@@ -104,8 +103,15 @@ public class ProductController {
     }
 
     @GetMapping("/product/detail")
+    public ResponseEntity<ProductDto.productDetailInfo> productManualDetail(
+            @RequestParam("item") String productId) {
+        ProductDto.productDetailInfo productDetail = productService.findProductManualDetail(productId);
+        return ResponseEntity.ok(productDetail);
+    }
+
+    @GetMapping("/product/barcode/detail")
     public ResponseEntity<ProductDto.productDetailInfo> productDetail(
-            @RequestParam("model_number") String barcodeNumber) {
+            @RequestParam("item") String barcodeNumber) {
         ProductDto.productDetailInfo productDetail = productService.findProductDetail(barcodeNumber);
         return ResponseEntity.ok(productDetail);
     }

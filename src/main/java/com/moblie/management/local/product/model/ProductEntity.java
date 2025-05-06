@@ -86,6 +86,7 @@ public class ProductEntity extends BaseEntity {
         return new ProductDto.productDetailInfo(
                 this.productId.toString(),
                 this.productName,
+                null,
                 this.classification.getClassificationName(),
                 this.material.getMaterialName(),
                 this.color.getColorName(),

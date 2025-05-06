@@ -44,7 +44,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
      * @return productSearchResult
      */
     @Override
-    public PageCustom<ProductDto.productSearchResult> searchProduct(ProductDto.productCondition condition, Pageable pageable) {
+    public PageCustom<ProductDto.productDetailInfo> searchProduct(ProductDto.productCondition condition, Pageable pageable) {
 
         BooleanBuilder whereClause = new BooleanBuilder();
         if (StringUtils.hasText(condition.getProductName())) {
@@ -57,8 +57,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
             whereClause.and(classificationEntity.classificationName.eq(condition.getModelClassification()));
         }
 
-        List<ProductDto.productSearchResult> content = query
-                .select(Projections.constructor(ProductDto.productSearchResult.class,
+        List<ProductDto.productDetailInfo> content = query
+                .select(Projections.constructor(ProductDto.productDetailInfo.class,
+                        productEntity.productId.stringValue(),
                         productEntity.productName,
                         factoryEntity.factoryName,
                         classificationEntity.classificationName,

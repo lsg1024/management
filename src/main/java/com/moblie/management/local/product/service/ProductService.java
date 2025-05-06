@@ -85,8 +85,15 @@ public class ProductService {
 
     //상품 조회
     @Cacheable(value = "sLC", key = "'productSearch' + #condition.productName + ':' + #condition.factory + ':' + #condition.modelClassification + ':' + #pageable.pageNumber", cacheManager = "redisCacheManager")
-    public PageCustom<ProductDto.productSearchResult> searchProducts(ProductDto.productCondition condition, Pageable pageable) {
+    public PageCustom<ProductDto.productDetailInfo> searchProducts(ProductDto.productCondition condition, Pageable pageable) {
         return productRepository.searchProduct(condition, pageable);
+    }
+
+    public ProductDto.productDetailInfo findProductManualDetail(String productId) {
+        ProductEntity product = productRepository.findById(Long.valueOf(productId))
+                .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404, "상품을 찾을 수 없습니다."));
+
+        return product.getProductDetailInfo();
     }
 
     public ProductDto.productDetailInfo findProductDetail(String barcodeNumber) {
