@@ -27,11 +27,11 @@ public class Order extends BaseEntity {
     @Column(name = "tracking_id", unique = true)
     private String trackingId;
 
-    @OneToOne(cascade = {PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY ,cascade = {PERSIST})
     @JoinColumn(name = "store_id")
     private Store store;
 
-    @OneToMany(mappedBy = "order", cascade = {PERSIST, REMOVE})
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order", cascade = {PERSIST, REMOVE})
     private List<OrderProduct> orderProducts = new ArrayList<>(); //주문 상품
 
     @Enumerated(EnumType.STRING)
