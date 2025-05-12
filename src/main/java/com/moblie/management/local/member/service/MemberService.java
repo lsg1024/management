@@ -53,11 +53,13 @@ public class MemberService {
             return true;
         }
 
-        if (sessionEmail.equals(email)) {
-            return true;
-        }
+        return sessionEmail.equals(email);
+    }
 
-        return false;
+    public boolean isAdmin() {
+        String sessionRole = SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority();
+        log.info("sessionRole {}", sessionRole);
+        return sessionRole.equals("ROLE_ADMIN");
     }
 
     @Transactional
