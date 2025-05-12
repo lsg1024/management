@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.data.web.config.PageableHandlerMethodArgumentResolverCustomizer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,6 +46,13 @@ public class ManagementApplication {
 			}
 
 			return Optional.of(UUID.randomUUID().toString());
+		};
+	}
+
+	@Bean
+	public PageableHandlerMethodArgumentResolverCustomizer customizer() {
+		return p -> {
+			p.setOneIndexedParameters(true);
 		};
 	}
 

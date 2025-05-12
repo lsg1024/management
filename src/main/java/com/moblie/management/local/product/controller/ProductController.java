@@ -91,7 +91,7 @@ public class ProductController {
             @RequestParam("product") String productName,
             @RequestParam("factory") String factoryName,
             @RequestParam("classification") String classification,
-            @PageableDefault(size = 16) Pageable pageable) {
+            @PageableDefault Pageable pageable) {
 
         ProductDto.productCondition condition = new ProductDto.productCondition(
                 productName,
