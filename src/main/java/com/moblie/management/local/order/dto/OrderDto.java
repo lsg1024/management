@@ -1,23 +1,29 @@
 package com.moblie.management.local.order.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class OrderDto {
 
     @Getter
-    public static class productsDto {
-        private List<order> productsDto;
+    @NoArgsConstructor
+    public static class productDto {
+        private String orderId;
+        private String storeName;
+        private String createDate;
+        private String modifiedDate;
+        private String trackingId;
+        private String status;
 
-        static class order {
-            private String cart_id;
-            private String order_id;
+        @QueryProjection
+        public productDto(String orderId, String storeName, String createDate, String modifiedDate, String trackingId, String status) {
+            this.orderId = orderId;
+            this.storeName = storeName;
+            this.createDate = createDate;
+            this.modifiedDate = modifiedDate;
+            this.trackingId = trackingId;
+            this.status = status;
         }
     }
 

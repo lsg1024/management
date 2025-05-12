@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -87,12 +88,12 @@ public class OrderProductCartService {
     }
 
 //    @Cacheable(value = "vLLC", key = "'cart:' + #userId", cacheManager = "redisCacheManager")
-    public PageCustom<CartDto.carts> getCarts(String userId, Pageable pageable) {
-        return orderProductCartRepository.findCartAll(userId, pageable);
+    public List<CartDto.carts> getCarts(String userId) {
+        return orderProductCartRepository.findCartAll(userId);
     }
 
-    public PageCustom<CartDto.productDetail> getCartProductDetail(String id, String cartTrackingId, Pageable pageable) {
-        return orderProductCartRepository.findCartProductDetailList(id, cartTrackingId, pageable);
+    public List<CartDto.productDetail> getCartProductDetail(String id, String cartTrackingId) {
+        return orderProductCartRepository.findUserCarts(id, cartTrackingId);
     }
 
     @DefaultRock(key = "'cart:' + #trackingId")

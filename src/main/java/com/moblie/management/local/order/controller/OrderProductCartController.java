@@ -18,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -93,21 +95,19 @@ public class OrderProductCartController {
     
     //장바구니 리스트
     @GetMapping("/carts")
-    public PageCustom<CartDto.carts> cartPage(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PageableDefault(size = 20) Pageable pageable) {
+    public List<CartDto.carts> cartPage(
+            @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        return orderProductCartService.getCarts(principalDetails.getId(), pageable);
+        return orderProductCartService.getCarts(principalDetails.getId());
     }
 
     //장바구니 내 상품 리스트 -> 페이징 말고 전체 값
     @GetMapping("/cart/info")
-    public PageCustom<CartDto.productDetail> cartProductDetailPage(
+    public List<CartDto.productDetail> cartProductDetailPage(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestParam(name = "cart") String cartTrackingId,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @RequestParam(name = "cart") String cartTrackingId) {
 
-        return orderProductCartService.getCartProductDetail(principalDetails.getId(), cartTrackingId, pageable);
+        return orderProductCartService.getCartProductDetail(principalDetails.getId(), cartTrackingId);
     }
 
     private void isAccess(String email) {

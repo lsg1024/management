@@ -2,6 +2,8 @@ package com.moblie.management.local.order.service;
 
 import com.moblie.management.global.exception.CustomException;
 import com.moblie.management.global.exception.ErrorCode;
+import com.moblie.management.global.utils.PageCustom;
+import com.moblie.management.local.order.dto.OrderDto;
 import com.moblie.management.local.order.model.Order;
 import com.moblie.management.local.order.model.OrderProduct;
 import com.moblie.management.local.order.model.OrderProductCart;
@@ -10,6 +12,7 @@ import com.moblie.management.local.order.repository.order_product.OrderProductRe
 import com.moblie.management.local.order.repository.order.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,4 +57,7 @@ public class OrderService {
         order.updateStatus();
     }
 
+    public PageCustom<OrderDto.productDto> getOrderList(String storeName, String startDate, String endDate, Pageable pageable) {
+        return orderRepository.findByOrderProducts(storeName, startDate, endDate, pageable);
+    }
 }

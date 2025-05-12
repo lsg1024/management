@@ -1,12 +1,8 @@
 package com.moblie.management.local.order.repository.order_product_cart;
 
-import com.moblie.management.global.utils.PageCustom;
 import com.moblie.management.local.order.dto.*;
-import com.moblie.management.local.order.model.OrderProductCart;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -23,8 +19,8 @@ public class OrderProductCartRepositoryImpl implements OrderProductCartCustom{
     }
 
     @Override
-    public PageCustom<CartDto.carts> findCartAll(String userId, Pageable pageable) {
-        List<CartDto.carts> content = query
+    public List<CartDto.carts> findCartAll(String userId) {
+        return query
                 .select(new QCartDto_carts(
                         orderProductCart.id.stringValue(),
                         store.storeName
@@ -33,20 +29,12 @@ public class OrderProductCartRepositoryImpl implements OrderProductCartCustom{
                 .join(orderProductCart.store, store)
                 .where(orderProductCart.createdBy.eq(userId))
                 .orderBy(orderProductCart.lastModifiedDate.asc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
                 .fetch();
-
-        JPAQuery<Long> countQuery = query
-                .select(orderProductCart.count())
-                .from(orderProductCart);
-
-        return new PageCustom<>(content, pageable, countQuery.fetchOne());
     }
 
     @Override
-    public PageCustom<CartDto.productDetail> findCartProductDetailList(String userId, String cartId, Pageable pageable) {
-        List<CartDto.productDetail> content = query
+    public List<CartDto.productDetail> findUserCarts(String userId, String cartId) {
+        return query
                 .select(new QCartDto_productDetail(
                         orderProduct.orderProductTrackingNumber,
                         productEntity.productName,
@@ -66,16 +54,42 @@ public class OrderProductCartRepositoryImpl implements OrderProductCartCustom{
                 .where(orderProductCart.id.eq(Long.parseLong(cartId)))
                 .where(orderProductCart.createdBy.eq(userId))
                 .orderBy(orderProduct.product.productName.asc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
                 .fetch();
 
-        JPAQuery<Long> countQuery = query
-                .select(orderProduct.count())
-                .from(orderProduct);
-
-        return new PageCustom<>(content, pageable, countQuery.fetchOne());
     }
+
+//    @Override
+//    public PageCustom<CartDto.productDetail> findCartProductDetailList(String userId, String cartId, Pageable pageable) {
+//        List<CartDto.productDetail> content = query
+//                .select(new QCartDto_productDetail(
+//                        orderProduct.orderProductTrackingNumber,
+//                        productEntity.productName,
+//                        classificationEntity.classificationName,
+//                        orderProduct.productGoldType,
+//                        orderProduct.productOrderColor,
+//                        productEntity.productWeight,
+//                        orderProduct.productOrderRequestNote,
+//                        orderProduct.amount,
+//                        productEntity.factory.factoryName
+//
+//                ))
+//                .from(orderProductCart)
+//                .join(orderProductCart.orderProducts, orderProduct)
+//                .join(orderProduct.product, productEntity)
+//                .join(productEntity.classification, classificationEntity)
+//                .where(orderProductCart.id.eq(Long.parseLong(cartId)))
+//                .where(orderProductCart.createdBy.eq(userId))
+//                .orderBy(orderProduct.product.productName.asc())
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetch();
+//
+//        JPAQuery<Long> countQuery = query
+//                .select(orderProduct.count())
+//                .from(orderProduct);
+//
+//        return new PageCustom<>(content, pageable, countQuery.fetchOne());
+//    }
 
     @Override
     public CartDto.productDetail findCartToTackingProductInfo(String userId, Long cartId, String trackingId) {
