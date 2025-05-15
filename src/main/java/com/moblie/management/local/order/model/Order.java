@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import static jakarta.persistence.CascadeType.*;
 @Entity
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE ORDERS SET DELETED = true WHERE ID = ?")
 public class Order extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +38,8 @@ public class Order extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus; // [CANCEL,WAIT,APPROVAL]
+
+    private boolean deleted = Boolean.FALSE;
 
     @Builder(access = AccessLevel.PROTECTED)
     protected Order(String trackingId, Store store, List<OrderProduct> orderProducts, OrderStatus orderStatus) {
@@ -61,7 +65,12 @@ public class Order extends BaseEntity {
         this.orderProducts.add(orderProduct);
     }
 
-    public void updateStatus() {
-        this.orderStatus =  OrderStatus.APPROVAL;
+    public void updateStatusApproval() {
+        this.orderStatus = OrderStatus.APPROVAL;
     }
+
+    public void updateStatusCancel() {
+        this.orderStatus = OrderStatus.CANCEL;
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.moblie.management.local.order.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -40,10 +41,21 @@ public class OrderDto {
     @Getter
     @NoArgsConstructor
     public static class updateDto {
+        @NotEmpty(message = "필수 입력 값입니다.")
         private String productGoldType;
+        @NotEmpty(message = "필수 입력 값입니다.")
         private String productColor;
         private String productRequestNote;
+        @NotEmpty(message = "필수 입력 값입니다.")
         private int amount;
+
+        @QueryProjection
+        public updateDto(String productGoldType, String productColor, String productRequestNote, int amount) {
+            this.productGoldType = productGoldType;
+            this.productColor = productColor;
+            this.productRequestNote = productRequestNote;
+            this.amount = amount;
+        }
     }
 
     @Getter
@@ -72,6 +84,31 @@ public class OrderDto {
             this.productWeight = productWeight;
             this.productRequestNote = productRequestNote;
             this.amount = amount;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class orderProducts {
+        private String trackingId;
+        private String productName;
+        private String factory;
+        private String classification;
+        private String productGoldType;
+        private String productColor;
+        private String productWeight;
+        private String productRequestNote;
+
+        @QueryProjection
+        public orderProducts(String trackingId, String productName, String factory, String classification, String productGoldType, String productColor, String productWeight, String productRequestNote) {
+            this.trackingId = trackingId;
+            this.productName = productName;
+            this.factory = factory;
+            this.classification = classification;
+            this.productGoldType = productGoldType;
+            this.productColor = productColor;
+            this.productWeight = productWeight;
+            this.productRequestNote = productRequestNote;
         }
     }
 

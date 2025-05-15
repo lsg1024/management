@@ -7,6 +7,7 @@ import com.moblie.management.local.order.dto.OrderDto;
 import com.moblie.management.local.order.model.Order;
 import com.moblie.management.local.order.model.OrderProduct;
 import com.moblie.management.local.order.model.OrderProductCart;
+import com.moblie.management.local.order.repository.order_product.OrderProductCustom;
 import com.moblie.management.local.order.repository.order_product_cart.OrderProductCartRepository;
 import com.moblie.management.local.order.repository.order_product.OrderProductRepository;
 import com.moblie.management.local.order.repository.order.OrderRepository;
@@ -26,6 +27,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderProductRepository orderProductRepository;
     private final OrderProductCartRepository orderProductCartRepository;
+    private final OrderProductCustom orderProductCustom;
 
     //장바구니값 주문
     @Transactional
@@ -47,17 +49,54 @@ public class OrderService {
 
     }
 
-    //주문 상품 승인 & 미승인 리스트 (승인/미승인 카테고리 검색)
-
     //주문 상품 승인
     @Transactional
     public void orderApproval(String trackingId) {
         Order order = orderRepository.findByTrackingId(trackingId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_404));
-        order.updateStatus();
+        order.updateStatusApproval();
     }
 
     public PageCustom<OrderDto.productDto> getOrderList(String storeName, String startDate, String endDate, Pageable pageable) {
         return orderRepository.findByOrderProducts(storeName, startDate, endDate, pageable);
+    }
+
+    public PageCustom<OrderDto.orderProducts> getOrders(String trackingId, Pageable pageable) {
+        return orderRepository.findByOrderReadyProducts(trackingId, pageable);
+    }
+
+    //주문 상품 상세 조회
+//    public
+
+    //주문 상품 정보 변경
+    @Transactional
+    public void orderInfoDetailUpdate(String trackingId, OrderDto.updateDto dto) {
+        OrderProduct orderProduct = orderProductRepository.findByOrderProductTrackingNumber(trackingId).orElseThrow(() ->
+                new CustomException(ErrorCode.ERROR_404, "존재하지 않은 주문 정보 입니다."));
+
+        orderProduct.updateProductInfo(dto);
+    }
+
+    @Transactional
+    public void cancelOrder(String trackingId) {
+        Order order = orderRepository.findByTrackingId(trackingId).orElseThrow(() ->
+                new CustomException(ErrorCode.ERROR_404, "존재하지 않은 주문 정보 입니다."));
+
+        orderRepository.delete(order);
+        order.updateStatusCancel();
+    }
+
+    @Transactional
+    public void orderInfoDetailCancel(String trackingId) {
+        OrderProduct orderProduct = orderProductRepository.findByOrderProductTrackingNumber(trackingId).orElseThrow(() ->
+                new CustomException(ErrorCode.ERROR_404, "존재하지 않은 상품 정보 입니다."));
+
+        orderProductRepository.delete(orderProduct);
+    }
+
+    //주문 제품 상세 조회
+    public OrderDto.orderProducts getOrderProductInfo(String optNumber) {
+        return orderProductCustom.findByOptNumber(optNumber).orElseThrow(() ->
+                new CustomException(ErrorCode.ERROR_404, "존재하지 않은 상품 정보 입니다."));
     }
 }

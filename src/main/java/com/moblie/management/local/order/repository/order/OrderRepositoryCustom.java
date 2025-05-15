@@ -6,8 +6,7 @@ import com.moblie.management.local.order.model.Order;
 import org.springframework.data.domain.Pageable;
 
 public interface OrderRepositoryCustom {
-
-    PageCustom<Order> findTrackingId(String trackingId);
     PageCustom<OrderDto.productDto> findByOrderProducts(String storeName, String startDate, String endDate, Pageable pageable);
+    PageCustom<OrderDto.orderProducts> findByOrderReadyProducts(String trackingId, Pageable pageable);
 
 }

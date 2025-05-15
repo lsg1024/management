@@ -6,6 +6,7 @@ import com.moblie.management.local.product.model.ProductEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 import java.util.UUID;
 
@@ -13,6 +14,7 @@ import static com.moblie.management.local.order.validation.OrderProductValidatio
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE ORDER_PRODUCT SET DELETED = true WHERE id = ?")
 public class OrderProduct {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +27,9 @@ public class OrderProduct {
     private String productOrderColor;
     private String productOrderRequestNote;
     private int amount;
+
+    private boolean deleted = Boolean.FALSE;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productId", nullable = false)
     private ProductEntity product;
