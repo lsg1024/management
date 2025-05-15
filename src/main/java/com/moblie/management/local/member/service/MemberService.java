@@ -56,12 +56,6 @@ public class MemberService {
         return sessionEmail.equals(email);
     }
 
-    public boolean isAdmin() {
-        String sessionRole = SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority();
-        log.info("sessionRole {}", sessionRole);
-        return sessionRole.equals("ROLE_ADMIN");
-    }
-
     @Transactional
     public void signUp(MemberDto.SignUp signUp) {
 
