@@ -14,7 +14,7 @@ import static com.moblie.management.local.order.validation.OrderProductValidatio
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE ORDER_PRODUCT SET DELETED = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE order_product SET DELETED = true WHERE order_product_id = ?")
 public class OrderProduct {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

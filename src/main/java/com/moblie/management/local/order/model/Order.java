@@ -19,7 +19,7 @@ import static jakarta.persistence.CascadeType.*;
 @Entity
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE ORDERS SET DELETED = true WHERE ID = ?")
+@SQLDelete(sql = "UPDATE orders SET DELETED = true WHERE order_id = ?")
 public class Order extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
