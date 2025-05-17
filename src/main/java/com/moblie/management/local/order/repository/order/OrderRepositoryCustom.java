@@ -9,4 +9,6 @@ public interface OrderRepositoryCustom {
     PageCustom<OrderDto.productDto> findByOrderProducts(String storeName, String startDate, String endDate, Pageable pageable);
     PageCustom<OrderDto.orderProducts> findByOrderReadyProducts(String trackingId, Pageable pageable);
 
+    void cancelOrderByTrackingId(String trackingId);
+
 }

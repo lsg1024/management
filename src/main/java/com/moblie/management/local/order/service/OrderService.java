@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -65,9 +66,6 @@ public class OrderService {
         return orderRepository.findByOrderReadyProducts(trackingId, pageable);
     }
 
-    //주문 상품 상세 조회
-//    public
-
     //주문 상품 정보 변경
     @Transactional
     public void orderInfoDetailUpdate(String trackingId, OrderDto.updateDto dto) {
@@ -79,19 +77,17 @@ public class OrderService {
 
     @Transactional
     public void cancelOrder(String trackingId) {
-        Order order = orderRepository.findByTrackingId(trackingId).orElseThrow(() ->
+        orderRepository.findByTrackingId(trackingId).orElseThrow(() ->
                 new CustomException(ErrorCode.ERROR_404, "존재하지 않은 주문 정보 입니다."));
 
-        orderRepository.delete(order);
-        order.updateStatusCancel();
+        orderRepository.cancelOrderByTrackingId(trackingId);
+        orderProductCustom.softDeletedByOrderTrackingId(trackingId);
     }
 
+    // 지금 trackingId 값은 주문장이므로 개별 Id 값으로 변경해야 됨
     @Transactional
     public void orderInfoDetailCancel(String trackingId) {
-        OrderProduct orderProduct = orderProductRepository.findByOrderProductTrackingNumber(trackingId).orElseThrow(() ->
-                new CustomException(ErrorCode.ERROR_404, "존재하지 않은 상품 정보 입니다."));
-
-        orderProductRepository.delete(orderProduct);
+        orderProductCustom.softDeletedByOrderTrackingId(trackingId);
     }
 
     //주문 제품 상세 조회

@@ -4,6 +4,7 @@ import com.moblie.management.global.utils.PageCustom;
 import com.moblie.management.local.order.dto.OrderDto;
 import com.moblie.management.local.order.dto.QOrderDto_orderProducts;
 import com.moblie.management.local.order.dto.QOrderDto_productDto;
+import com.moblie.management.local.order.model.OrderStatus;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -46,6 +47,9 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         if (storeName != null && !storeName.isEmpty()) {
             builder.and(store.storeName.containsIgnoreCase(storeName));
         }
+
+        //상태 조회
+        builder.and(order.deleted.eq(false));
 
         List<OrderDto.productDto> content = query
                 .select(new QOrderDto_productDto(
@@ -98,5 +102,14 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                     .from(order);
 
         return new PageCustom<>(content, pageable, countQuery.fetchOne());
+    }
+
+    @Override
+    public void cancelOrderByTrackingId(String trackingId) {
+        query.update(order)
+                .set(order.orderStatus, OrderStatus.CANCEL)
+                .set(order.deleted, true)
+                .where(order.trackingId.eq(trackingId))
+                .execute();
     }
 }

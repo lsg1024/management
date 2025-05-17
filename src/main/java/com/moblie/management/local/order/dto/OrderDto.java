@@ -1,7 +1,9 @@
 package com.moblie.management.local.order.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -46,7 +48,7 @@ public class OrderDto {
         @NotEmpty(message = "필수 입력 값입니다.")
         private String productColor;
         private String productRequestNote;
-        @NotEmpty(message = "필수 입력 값입니다.")
+        @Min(1)
         private int amount;
 
         @QueryProjection

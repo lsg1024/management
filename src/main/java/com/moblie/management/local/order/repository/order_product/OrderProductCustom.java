@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface OrderProductCustom {
     Optional<OrderDto.orderProducts> findByOptNumber(String opt_number);
+    void softDeletedByOrderTrackingId(String tracking_id);
 }

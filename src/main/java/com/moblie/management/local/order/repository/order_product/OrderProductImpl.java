@@ -40,9 +40,19 @@ public class OrderProductImpl implements OrderProductCustom{
                 .join(orderProduct.product, productEntity)
                 .join(productEntity.factory, factoryEntity)
                 .join(productEntity.classification, classificationEntity)
-                .where(orderProduct.orderProductTrackingNumber.eq(orderProductTrackingNumber))
+                .where(orderProduct.orderProductTrackingNumber.eq(orderProductTrackingNumber)
+                        .and(orderProduct.deleted.eq(false)))
                 .fetchOne();
 
         return Optional.ofNullable(productInfo);
+    }
+
+    @Override
+    public void softDeletedByOrderTrackingId(String tracking_id) {
+        query
+            .update(orderProduct)
+            .set(orderProduct.deleted, true)
+            .where(orderProduct.order.trackingId.eq(tracking_id))
+            .execute();
     }
 }
