@@ -19,7 +19,7 @@ public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
 
         PrincipalDetails customUserDetails = (PrincipalDetails) authentication.getPrincipal();
-        loginUtil.handleSuccessfulAuthentication(customUserDetails.getId(), customUserDetails.getEmail(), customUserDetails.getRole(), response);
+        loginUtil.handleSuccessfulAuthentication(customUserDetails.getId(), customUserDetails.getEmail(), customUserDetails.getUsername(), customUserDetails.getRole(), response);
 
     }
 

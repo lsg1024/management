@@ -36,8 +36,8 @@ public class MobileMemberController {
         MemberEntity member = customOAuth2UserService.processOAuth2User(kakaoInfo);
 
         MemberDto.MemberInfo memberInfo = member.getMemberInfo();
-        String accessToken = jwtUtil.createJwt("access", memberInfo.getUserId(), memberInfo.getEmail(), memberInfo.getRole(), ACCESS_TTL);
-        String refreshToken = jwtUtil.createJwt("refresh", memberInfo.getUserId(), memberInfo.getEmail(), memberInfo.getRole(), REFRESH_TTL);
+        String accessToken = jwtUtil.createJwt("access", memberInfo.getUserId(), memberInfo.getEmail(), member.getNickname(), memberInfo.getRole(), ACCESS_TTL);
+        String refreshToken = jwtUtil.createJwt("refresh", memberInfo.getUserId(), memberInfo.getEmail(), member.getNickname(), memberInfo.getRole(), REFRESH_TTL);
 
         redisRefreshTokenService.createNewToken(member.getEmail(), refreshToken);
 

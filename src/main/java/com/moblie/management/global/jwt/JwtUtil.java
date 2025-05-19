@@ -42,12 +42,13 @@ public class JwtUtil {
     }
 
     // jwt 토큰 생성
-    public String createJwt(String category, String id, String name, String role, Long expireTime) {
+    public String createJwt(String category, String id, String name, String nickname, String role, Long expireTime) {
 
         return Jwts.builder()
                 .claim("category", category)
                 .claim("id", id)
                 .claim("email", name)
+                .claim("nickname", nickname)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis())) // 현재 시간
                 .expiration(new Date(System.currentTimeMillis() + expireTime * 1000)) // 만료 시간

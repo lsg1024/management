@@ -68,11 +68,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String id = jwtUtil.getUserId(accessToken);
         String email = jwtUtil.getEmail(accessToken);
+        String nickname = jwtUtil.getNickname(accessToken);
         String role = jwtUtil.getRole(accessToken);
 
         MemberEntity oAuth2UserDto = MemberEntity.builder()
                 .userid(Long.parseLong(id))
                 .email(email)
+                .nickname(nickname)
                 .role(Role.valueOf(role))
                 .build();
 

@@ -24,7 +24,7 @@ public class LoginUtil {
     private final static Long ACCESS_TTL = 3 * 24 * 60 * 60L;
     private final static Long REFRESH_TTL = 14 * 24 * 60 * 60L;
 
-    public void handleSuccessfulAuthentication(String userId, String email, String role, HttpServletResponse response) throws IOException {
+    public void handleSuccessfulAuthentication(String userId, String email, String nickname, String role, HttpServletResponse response) throws IOException {
         // WAIT 권한의 사용자는 처리하지 않음
         if (role.equals("WAIT")) {
             response.sendRedirect("/login?error");
@@ -34,8 +34,8 @@ public class LoginUtil {
         log.info("handleSuccessfulAuthentication");
 
         // 토큰 생성
-        String accessToken = jwtUtil.createJwt("access", userId, email, role, ACCESS_TTL);
-        String refreshToken = jwtUtil.createJwt("refresh", userId, email, role, REFRESH_TTL);
+        String accessToken = jwtUtil.createJwt("access", userId, email, nickname, role, ACCESS_TTL);
+        String refreshToken = jwtUtil.createJwt("refresh", userId, email, nickname, role, REFRESH_TTL);
 
         // 리프레시 토큰 DB 저장
         redisRefreshTokenService.createNewToken(email, refreshToken);
