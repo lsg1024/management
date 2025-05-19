@@ -18,6 +18,12 @@ public class MemberValidation {
         }
     }
 
+    public static void validateCheckOldPassword(String oldPassword, String password) {
+        if (password.equals(oldPassword)) {
+            throw new CustomException(ErrorCode.ERROR_409, "동일한 비밀번호 입니다.");
+        }
+    }
+
     public static void validateEmail(String email) {
         if (email == null || email.isBlank()) {
             throw new CustomException(ErrorCode.ERROR_400, "옳바른 사용자 정보를 입력해주세요");

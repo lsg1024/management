@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import static com.moblie.management.global.redis.validation.TokenValidation.*;
 import static com.moblie.management.local.member.util.MemberUtil.randomNumbers;
+import static com.moblie.management.local.member.validation.MemberValidation.*;
 
 @Service
 @Slf4j
@@ -69,7 +70,7 @@ public class MemberService {
             throw new CustomException(ErrorCode.ERROR_400, "동일한 이름이 존재합니다.");
         }
 
-        MemberValidation.validateConfirmPassword(signUp.getPassword(), signUp.getPassword_confirm());
+        validateConfirmPassword(signUp.getPassword(), signUp.getPassword_confirm());
 
         MemberEntity member = MemberEntity.builder()
                 .email(signUp.getEmail())
@@ -81,6 +82,14 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    public void signOut(String email) {
+        try {
+            redisRefreshTokenService.deleteToken(email);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.ERROR_400, "로그아웃 실패");
+        }
+    }
+
     @Transactional
     public String[] reissueRefreshToken(String refreshToken) {
         log.info("reissueRefreshToken");
@@ -89,10 +98,11 @@ public class MemberService {
 
         String id = jwtUtil.getUserId(refresh);
         String email = jwtUtil.getEmail(refresh);
+        String nickname = jwtUtil.getNickname(refresh);
         String role = jwtUtil.getRole(refresh);
 
-        String newAccessToken = jwtUtil.createJwt("access", id, email, role, ACCESS_TTL);
-        String newRefreshToken = jwtUtil.createJwt("refresh", id, email, role, REFRESH_TTL);
+        String newAccessToken = jwtUtil.createJwt("access", id, email, nickname, role, ACCESS_TTL);
+        String newRefreshToken = jwtUtil.createJwt("refresh", id, email, nickname, role, REFRESH_TTL);
 
         redisRefreshTokenService.updateNewToken(email, newRefreshToken);
 
@@ -102,6 +112,10 @@ public class MemberService {
 
     public void sendEmail(MemberDto.MemberEmail memberEmail) {
 
+        boolean existsByEmail = memberRepository.existsByEmail(memberEmail.getEmail());
+
+        if (!existsByEmail) throw new CustomException(ErrorCode.ERROR_404, "이메일 주소를 확인해주세요.");
+
         Random random = new Random();
 
         String certificationNumbers = randomNumbers(random);
@@ -110,7 +124,7 @@ public class MemberService {
 
         mailMessage.setTo(memberEmail.getEmail());
         mailMessage.setSubject("비밀번호 변경을 위한 인증번호");
-        mailMessage.setText("유효시간은 3분 입니다.\n" + certificationNumbers);
+        mailMessage.setText("유효시간은 5분 입니다.\n" + certificationNumbers);
 
         certificationNumberService.createToken(memberEmail.getEmail(), certificationNumbers);
         javaMailSender.send(mailMessage);
@@ -141,8 +155,12 @@ public class MemberService {
 
         MemberEntity member = memberRepository.findByEmail(email);
 
-        MemberValidation.validateConfirmPassword(passwordDto.getPassword(), passwordDto.getPassword_confirm());
-        member.updatePassword(encoder.encode(passwordDto.getPassword()));
+        validateConfirmPassword(passwordDto.getPassword(), passwordDto.getPassword_confirm());
+
+        String encode_newPassword = encoder.encode(passwordDto.getPassword());
+        validateCheckOldPassword(member.getPassword(), encode_newPassword);
+
+        member.updatePassword(encode_newPassword);
 
         certificationNumberService.deleteToken(email);
     }
@@ -184,5 +202,4 @@ public class MemberService {
                 .map(CertificationNumberToken::getRandomValue)
                 .orElseThrow(() -> new CustomException(ErrorCode.ERROR_401, "유효기간이 지났습니다."));
     }
-
 }
