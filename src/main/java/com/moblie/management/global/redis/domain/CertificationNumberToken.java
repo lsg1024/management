@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.springframework.data.redis.core.RedisHash;
 
 @Getter @Setter
-@RedisHash(value = "certification", timeToLive = 3 * 60)
+@RedisHash(value = "certification", timeToLive = 5 * 60)
 public class CertificationNumberToken {
     @Id
     private String email;
