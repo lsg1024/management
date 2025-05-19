@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import static com.moblie.management.local.member.util.MemberUtil.createCookie;
 import static com.moblie.management.local.member.validation.MemberValidation.*;
@@ -39,7 +41,9 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final RedisRefreshTokenService redisRefreshTokenService;
 
-    public CustomLoginFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil, RedisRefreshTokenService redisRefreshTokenService) {
+    public CustomLoginFilter(AuthenticationManager authenticationManager,
+                             JwtUtil jwtUtil,
+                             RedisRefreshTokenService redisRefreshTokenService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.redisRefreshTokenService = redisRefreshTokenService;
@@ -77,8 +81,8 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         String role = auth.getAuthority();
 
         // 토큰 생성
-        String accessToken = jwtUtil.createJwt("access", customUserDetails.getId(), customUserDetails.getEmail(), role, ACCESS_TTL);
-        String refreshToken = jwtUtil.createJwt("refresh", customUserDetails.getId(), customUserDetails.getEmail(), role, REFRESH_TTL);
+        String accessToken = jwtUtil.createJwt("access", customUserDetails.getId(), customUserDetails.getEmail(), customUserDetails.getUsername(), role, ACCESS_TTL);
+        String refreshToken = jwtUtil.createJwt("refresh", customUserDetails.getId(), customUserDetails.getEmail(), customUserDetails.getUsername(), role, REFRESH_TTL);
 
         // 리프레시 토큰 DB 저장
         redisRefreshTokenService.createNewToken(customUserDetails.getEmail(), refreshToken);
@@ -99,6 +103,15 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+
+        String message = failed.getMessage();
+
+        String body = new ObjectMapper().writeValueAsString(
+                new Response(HttpStatus.UNAUTHORIZED, message, List.of(message))
+        );
+
+        response.getWriter().write(body);
 
     }
 
