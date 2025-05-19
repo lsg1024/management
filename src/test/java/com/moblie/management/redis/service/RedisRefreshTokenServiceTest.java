@@ -37,7 +37,7 @@ class RedisRefreshTokenServiceTest {
     @Test
     void createNewToken() {
         //given
-        String tokenValue = jwtUtil.createJwt("refresh", userid, "test@gamil.com", "USER", 259200L);
+        String tokenValue = jwtUtil.createJwt("refresh", userid, "test@gamil.com", "nickname", "USER", 259200L);
 
         // when
         redisRefreshTokenService.createNewToken(userid, tokenValue);

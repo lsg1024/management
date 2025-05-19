@@ -93,7 +93,7 @@ class MemberServiceTest {
         MemberEntity member = memberRepository.findByEmail(EMAIL);
 
         //when
-        String refresh = jwtUtil.createJwt("refresh", member.getUserid().toString(), member.getEmail(), member.getRole().toString(), 1000L);
+        String refresh = jwtUtil.createJwt("refresh", member.getUserid().toString(), member.getEmail(), member.getNickname(), member.getRole().toString(), 1000L);
         redisRefreshTokenService.createNewToken(member.getEmail(), refresh);
 
         String[] tokens = memberService.reissueRefreshToken(refresh);
@@ -116,7 +116,7 @@ class MemberServiceTest {
         MemberEntity member = memberRepository.findByEmail(EMAIL);
 
         //when
-        String refresh = jwtUtil.createJwt("refresh", member.getUserid().toString(), member.getEmail(), member.getRole().toString(), -1L);
+        String refresh = jwtUtil.createJwt("refresh", member.getUserid().toString(), member.getEmail(), member.getNickname(), member.getRole().toString(), -1L);
         redisRefreshTokenService.createNewToken(member.getEmail(), refresh);
 
         //then
