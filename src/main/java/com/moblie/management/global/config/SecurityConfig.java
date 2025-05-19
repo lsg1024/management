@@ -106,7 +106,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable);
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/signup", "/login", "/reissue", "/images/**").permitAll()
+                        .requestMatchers("/signup", "/signin/**", "/login", "/reissue", "/images/**").permitAll()
                         .requestMatchers("/product/**", "/products/**", "/product/**", "/factory/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/admin/**", "/order/approve").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
