@@ -24,7 +24,6 @@ public class MemberEntity {
     private String password;
     @Column(unique = true) // oauth 데이터 정보
     private String username; // 사용자 플렛폼 정보
-    @Column(unique = true)
     private String nickname; // 사용자 이름
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -44,12 +43,6 @@ public class MemberEntity {
         return new MemberDto.MemberInfo(this.userid.toString(), this.email, this.role.toString());
     }
 
-    public boolean isUserNameExist() {
-        return username != null;
-    }
-    public boolean isEmailExist() {
-        return email != null;
-    }
     public void updateNicknameAndEmail(String nickname, String email) {
         this.nickname = nickname;
         this.email = email;
@@ -66,5 +59,6 @@ public class MemberEntity {
         this.password = UUID.randomUUID().toString();
         this.username = null;
         this.nickname = "탈퇴한 사용자-" + UUID.randomUUID();
+        this.role = Role.SECESSION;
     }
 }
