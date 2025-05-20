@@ -99,10 +99,11 @@ public class OrderDto {
         private String productGoldType;
         private String productColor;
         private String productWeight;
+        private int amount;
         private String productRequestNote;
 
         @QueryProjection
-        public orderProducts(String trackingId, String productName, String factory, String classification, String productGoldType, String productColor, String productWeight, String productRequestNote) {
+        public orderProducts(String trackingId, String productName, String factory, String classification, String productGoldType, String productColor, String productWeight, int amount, String productRequestNote) {
             this.trackingId = trackingId;
             this.productName = productName;
             this.factory = factory;
@@ -110,6 +111,7 @@ public class OrderDto {
             this.productGoldType = productGoldType;
             this.productColor = productColor;
             this.productWeight = productWeight;
+            this.amount = amount;
             this.productRequestNote = productRequestNote;
         }
     }

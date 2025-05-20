@@ -85,6 +85,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                         orderProduct.productGoldType,
                         orderProduct.productOrderColor,
                         productEntity.productWeight,
+                        orderProduct.amount,
                         orderProduct.productOrderRequestNote
 
                 ))

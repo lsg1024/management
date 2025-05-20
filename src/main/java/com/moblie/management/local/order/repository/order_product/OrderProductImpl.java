@@ -34,6 +34,7 @@ public class OrderProductImpl implements OrderProductCustom{
                         orderProduct.productGoldType,
                         orderProduct.productOrderColor,
                         productEntity.productWeight,
+                        orderProduct.amount,
                         orderProduct.productOrderRequestNote
                 ))
                 .from(orderProduct)
