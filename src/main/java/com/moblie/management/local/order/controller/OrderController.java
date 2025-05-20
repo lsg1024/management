@@ -83,7 +83,7 @@ public class OrderController {
 
         isAccess(principalDetails.getEmail());
 
-        return orderService.getOrders(trackingId, pageable);
+        return orderService.getOrderInfo(trackingId, pageable);
     }
 
     //주문 상품 상세 정보

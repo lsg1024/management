@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -62,7 +61,7 @@ public class OrderService {
         return orderRepository.findByOrderProducts(storeName, startDate, endDate, pageable);
     }
 
-    public PageCustom<OrderDto.orderProducts> getOrders(String trackingId, Pageable pageable) {
+    public PageCustom<OrderDto.orderProducts> getOrderInfo(String trackingId, Pageable pageable) {
         return orderRepository.findByOrderReadyProducts(trackingId, pageable);
     }
 
